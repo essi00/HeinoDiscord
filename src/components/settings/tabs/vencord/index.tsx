@@ -33,7 +33,7 @@ import { isPluginDev } from "@utils/misc";
 import { relaunch } from "@utils/native";
 import { Alerts, Forms, React, useMemo, UserStore } from "@webpack/common";
 
-import { DonateButtonComponent, isDonor } from "./DonateButton";
+import { isDonor } from "./DonateButton";
 import { VibrancySettings } from "./MacVibrancySettings";
 import { NotificationSection } from "./NotificationSettings";
 
@@ -124,7 +124,7 @@ function Switches() {
     });
 }
 
-function VencordSettings() {
+function HeinoDiscordSettings() {
     const donateImage = useMemo(() =>
         Math.random() > 0.5 ? DEFAULT_DONATE_IMAGE : SHIGGY_DONATE_IMAGE,
         []
@@ -139,26 +139,22 @@ function VencordSettings() {
             {isDonor(user?.id)
                 ? (
                     <SpecialCard
-                        title="Donations"
-                        subtitle="Thank you for donating!"
-                        description="You can manage your perks at any time by messaging @vending.machine."
+                        title="Open Source Support"
+                        subtitle="Thank you for supporting the plugin ecosystem."
+                        description="HeinoDiscord keeps upstream attribution while presenting its own open-source product surface."
                         cardImage={VENNIE_DONATOR_IMAGE}
                         backgroundImage={DONOR_BACKGROUND_IMAGE}
                         backgroundColor="#ED87A9"
-                    >
-                        <DonateButtonComponent />
-                    </SpecialCard>
+                    />
                 )
                 : (
                     <SpecialCard
-                        title="Support the Project"
-                        description="Please consider supporting the development of Vencord by donating!"
+                        title="HeinoDiscord"
+                        description="A local-first, open-source Discord client mod distribution with its own installer, registry, data folder, release package, and public runtime API."
                         cardImage={donateImage}
                         backgroundImage={DONOR_BACKGROUND_IMAGE}
                         backgroundColor="#c3a3ce"
-                    >
-                        <DonateButtonComponent />
-                    </SpecialCard>
+                    />
                 )
             }
 
@@ -166,7 +162,7 @@ function VencordSettings() {
                 <SpecialCard
                     title="Contributions"
                     subtitle="Thank you for contributing!"
-                    description="Since you've contributed to Vencord you now have a cool new badge!"
+                    description="Since you've contributed to the compatible plugin ecosystem you now have a local badge."
                     cardImage={COZY_CONTRIB_IMAGE}
                     backgroundImage={CONTRIB_BACKGROUND_IMAGE}
                     backgroundColor="#EDCC87"
@@ -233,4 +229,4 @@ function VencordSettings() {
     );
 }
 
-export default wrapTab(VencordSettings, "Vencord Settings");
+export default wrapTab(HeinoDiscordSettings, "HeinoDiscord Settings");

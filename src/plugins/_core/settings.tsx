@@ -80,7 +80,7 @@ interface SettingsLayoutBuilder {
 const settings = definePluginSettings({
     settingsLocation: {
         type: OptionType.SELECT,
-        description: "Where to put the Vencord settings section",
+        description: "Where to put the HeinoDiscord settings section",
         options: [
             { label: "At the very top", value: "top" },
             { label: "Above the Nitro section", value: "aboveNitro", default: true },
@@ -163,11 +163,11 @@ export default definePlugin({
 
         const { buildEntry } = this;
 
-        const vencordEntries: SettingsLayoutNode[] = [
+        const heinoDiscordEntries: SettingsLayoutNode[] = [
             buildEntry({
                 key: "vencord_main",
-                title: "Vencord",
-                panelTitle: "Vencord Settings",
+                title: "HeinoDiscord",
+                panelTitle: "HeinoDiscord Settings",
                 Component: VencordTab,
                 Icon: MainSettingsIcon
             }),
@@ -186,14 +186,14 @@ export default definePlugin({
             !IS_UPDATER_DISABLED && UpdaterTab && buildEntry({
                 key: "vencord_updater",
                 title: "Updater",
-                panelTitle: "Vencord Updater",
+                panelTitle: "HeinoDiscord Updater",
                 Component: UpdaterTab,
                 Icon: UpdaterIcon
             }),
             buildEntry({
                 key: "vencord_cloud",
                 title: "Cloud",
-                panelTitle: "Vencord Cloud",
+                panelTitle: "HeinoDiscord Cloud",
                 Component: CloudTab,
                 Icon: CloudIcon
             }),
@@ -224,11 +224,11 @@ export default definePlugin({
             })
         ].filter(isTruthy);
 
-        const vencordSection: SettingsLayoutNode = {
+        const heinoDiscordSection: SettingsLayoutNode = {
             key: "vencord_section",
             type: LayoutTypes.SECTION,
-            useTitle: () => "Vencord Settings",
-            buildLayout: () => vencordEntries
+            useTitle: () => "HeinoDiscord Settings",
+            buildLayout: () => heinoDiscordEntries
         };
 
         const { settingsLocation } = settings.store;
@@ -251,7 +251,7 @@ export default definePlugin({
             idx += 1;
         }
 
-        layout.splice(idx, 0, vencordSection);
+        layout.splice(idx, 0, heinoDiscordSection);
 
         return layout;
     },
@@ -286,7 +286,7 @@ export default definePlugin({
     getInfoRows() {
         const { electronVersion, chromiumVersion, additionalInfo } = this;
 
-        const rows = [`Vencord ${gitHash}${additionalInfo}`];
+        const rows = [`HeinoDiscord ${gitHash}${additionalInfo}`];
 
         if (electronVersion) rows.push(`Electron ${electronVersion}`);
         if (chromiumVersion) rows.push(`Chromium ${chromiumVersion}`);
