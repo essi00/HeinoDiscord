@@ -1,20 +1,21 @@
 {
-    "name": "vencord",
+    "name": "opencord",
     "private": "true",
     "version": "1.14.11",
-    "description": "The cutest Discord client mod",
-    "homepage": "https://github.com/Vendicated/Vencord#readme",
+    "description": "An independent GPL Discord client mod distribution with Vencord-compatible plugins",
+    "homepage": "https://example.invalid/opencord",
     "bugs": {
-        "url": "https://github.com/Vendicated/Vencord/issues"
+        "url": "https://example.invalid/opencord/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Vendicated/Vencord.git"
+        "url": "git+https://example.invalid/opencord.git"
     },
     "license": "GPL-3.0-or-later",
-    "author": "Vendicated",
+    "author": "OpenCord contributors, based on Vendicated/Vencord contributors",
     "scripts": {
         "build": "node --require=./scripts/suppressExperimentalWarnings.js scripts/build/build.mjs",
+        "build:discord": "node --require=./scripts/suppressExperimentalWarnings.js scripts/build/build.mjs --disable-updater",
         "buildStandalone": "pnpm build --standalone",
         "buildWeb": "node --require=./scripts/suppressExperimentalWarnings.js scripts/build/buildWeb.mjs",
         "buildWebStandalone": "pnpm buildWeb --standalone",
@@ -26,6 +27,11 @@
         "generatePluginJson": "tsx scripts/generatePluginList.ts",
         "generateTypes": "tspc --emitDeclarationOnly --declaration --outDir packages/vencord-types --allowJs false",
         "inject": "node scripts/runInstaller.mjs -- --install",
+        "opencord:plugins": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File opencord/scripts/install-plugins.ps1",
+        "opencord:create-plugin": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File opencord/scripts/create-plugin.ps1",
+        "opencord:patch": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File opencord/scripts/build-and-patch.ps1",
+        "opencord:auto-repatch": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File opencord/scripts/auto-repatch.ps1",
+        "opencord:register-auto-repatch": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File opencord/scripts/register-auto-repatch.ps1",
         "uninject": "node scripts/runInstaller.mjs -- --uninstall",
         "lint": "eslint",
         "lint-styles": "stylelint \"src/**/*.css\" --ignore-pattern src/userplugins",

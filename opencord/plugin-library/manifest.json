@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "name": "OpenCord Plugin Library",
+  "description": "A source-based, opt-in OpenCord userplugin library. Users choose exactly which plugins are copied into src/userplugins before rebuilding OpenCord.",
+  "license": "GPL-3.0-or-later",
+  "plugins": [
+    {
+      "name": "QuickTemplates",
+      "source": "plugins/QuickTemplates",
+      "target": "QuickTemplates",
+      "category": "productivity",
+      "recommended": true,
+      "advanced": false,
+      "description": "Local support/chat templates. Type ;;hello or use /qt to preview templates.",
+      "dependencies": ["CommandsAPI"]
+    },
+    {
+      "name": "LinkSafety",
+      "source": "plugins/LinkSafety",
+      "target": "LinkSafety",
+      "category": "privacy",
+      "recommended": true,
+      "advanced": false,
+      "description": "Blocks obvious phishing-style links before they are sent. No external requests.",
+      "dependencies": ["CommandsAPI"]
+    },
+    {
+      "name": "TranslatorPro",
+      "source": "plugins/TranslatorPro",
+      "target": "TranslatorPro",
+      "category": "translation",
+      "recommended": true,
+      "advanced": false,
+      "description": "Extended translation with Google, DeepL, DeepSeek, backup engine, and auto-translate options.",
+      "dependencies": ["CommandsAPI", "MessagePopoverAPI", "ChatInputButtonAPI"]
+    },
+    {
+      "name": "LocalChatExporter",
+      "source": "plugins/LocalChatExporter",
+      "target": "LocalChatExporter",
+      "category": "archive",
+      "recommended": true,
+      "advanced": false,
+      "description": "Token-free local export of currently cached channel messages as JSON or Markdown.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Exports only messages already loaded in the current Discord client. It never reads or stores an account token."
+    },
+    {
+      "name": "LastSeenTracker",
+      "source": "plugins/lastSeenTracker",
+      "target": "lastSeenTracker",
+      "category": "local-insight",
+      "recommended": false,
+      "advanced": true,
+      "description": "Tracks locally observed online/offline transitions and shows last-seen info.",
+      "privacy": "Stores observed presence timestamps locally."
+    },
+    {
+      "name": "AntiLog",
+      "source": "plugins/antilog",
+      "target": "antilog",
+      "category": "utility",
+      "recommended": false,
+      "advanced": false,
+      "description": "Placeholder compatibility plugin."
+    },
+    {
+      "name": "SilentEdit",
+      "source": "plugins/silentEdit.tsx",
+      "target": "silentEdit.tsx",
+      "category": "advanced",
+      "recommended": false,
+      "advanced": true,
+      "description": "Advanced opt-in plugin that resends/deletes messages to avoid the edited tag.",
+      "warning": "Can confuse moderation/logging expectations. Use only where allowed."
+    },
+    {
+      "name": "SilentDelete",
+      "source": "plugins/silentDelete.tsx",
+      "target": "silentDelete.tsx",
+      "category": "advanced",
+      "recommended": false,
+      "advanced": true,
+      "description": "Advanced opt-in message replacement/deletion helper.",
+      "warning": "Can confuse moderation/logging expectations. Use only where allowed."
+    }
+  ]
+}

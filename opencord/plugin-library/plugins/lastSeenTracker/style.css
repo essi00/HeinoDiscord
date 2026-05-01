@@ -1,0 +1,80 @@
+.vc-lst-member-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 4px;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.vc-lst-invisible-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    cursor: pointer;
+}
+
+.vc-lst-invisible-icon svg {
+    color: var(--status-danger);
+    opacity: 0.85;
+}
+
+.vc-lst-invisible-icon:hover svg {
+    opacity: 1;
+}
+
+.vc-lst-mutual-servers {
+    margin-top: 6px;
+}
+
+.vc-lst-mutual-servers-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.vc-lst-mutual-servers-header:hover {
+    opacity: 0.8;
+}
+
+.vc-lst-mutual-servers-chevron {
+    transition: transform 0.15s ease;
+}
+
+.vc-lst-mutual-servers-chevron[data-expanded="true"] {
+    transform: rotate(90deg);
+}
+
+.vc-lst-mutual-servers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    padding-left: 4px;
+}
+
+.vc-lst-mutual-server-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-normal);
+}
+
+.vc-lst-mutual-server-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.vc-lst-popout-lastseen {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
