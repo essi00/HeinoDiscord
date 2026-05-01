@@ -90,6 +90,15 @@ Full guide:
 HEINODISCORD_FULL_EXPORT.md
 ```
 
+For DMs without a bot, use Discord's official data package import:
+
+```powershell
+pnpm heino:import-data-package -- --input "C:\Path\To\discord-data-package.zip"
+```
+
+That path does not use a token, but Discord's package only includes messages
+sent by your account.
+
 ## Enable Optional LastSeenTracker
 
 ```cmd

@@ -105,3 +105,7 @@ Commands:
 
 For all accessible history across a server, use the bot-based full exporter in
 `HEINODISCORD_FULL_EXPORT.md`.
+
+For DMs without a bot, import Discord's official data package with
+`pnpm heino:import-data-package -- --input <package.zip>`. See
+`HEINODISCORD_DATA_PACKAGE_IMPORT.md`.

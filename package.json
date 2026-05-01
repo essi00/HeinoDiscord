@@ -38,6 +38,7 @@
         "heino:package": "node opencord/scripts/run-powershell.mjs opencord/scripts/package-release.ps1",
         "heino:publish-github": "node opencord/scripts/run-powershell.mjs opencord/scripts/publish-github.ps1",
         "heino:export-history": "node opencord/scripts/export-history.mjs",
+        "heino:import-data-package": "node opencord/scripts/import-data-package.mjs",
         "uninject": "node scripts/runInstaller.mjs -- --uninstall",
         "lint": "eslint",
         "lint-styles": "stylelint \"src/**/*.css\" --ignore-pattern src/userplugins",

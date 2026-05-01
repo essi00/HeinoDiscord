@@ -31,6 +31,10 @@ the export, scroll/load more of the channel first and run:
 For full channel history, use the bot-based exporter instead:
 [Full history export](./HEINODISCORD_FULL_EXPORT.md).
 
+For DM exports without a bot, import Discord's official account data package:
+[Data package import](./HEINODISCORD_DATA_PACKAGE_IMPORT.md). It does not use a
+token, but it is limited to messages Discord includes in your package.
+
 Start here:
 
 - [HeinoDiscord product guide](./HEINODISCORD.md)
