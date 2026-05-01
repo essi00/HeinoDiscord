@@ -102,3 +102,6 @@ Commands:
 /export-local-chat
 /export-local-chat format:markdown
 ```
+
+For all accessible history across a server, use the bot-based full exporter in
+`HEINODISCORD_FULL_EXPORT.md`.

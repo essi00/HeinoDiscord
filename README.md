@@ -28,6 +28,9 @@ the export, scroll/load more of the channel first and run:
 /export-local-chat format:markdown
 ```
 
+For full channel history, use the bot-based exporter instead:
+[Full history export](./HEINODISCORD_FULL_EXPORT.md).
+
 Start here:
 
 - [HeinoDiscord product guide](./HEINODISCORD.md)

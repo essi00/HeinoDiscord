@@ -41,6 +41,7 @@ $items = @(
     "HEINODISCORD.md",
     "HEINODISCORD_TUTORIAL.md",
     "HEINODISCORD_PLUGIN_API.md",
+    "HEINODISCORD_FULL_EXPORT.md",
     "GITHUB_PUBLISHING.md",
     "OPENCORD.md",
     "FORK_NOTICE.md",

@@ -41,6 +41,8 @@ Token-free local channel export.
   loaded in the client.
 - The exported file is created locally with a browser download.
 - Scroll/load more history first if you need more messages in the export.
+- For complete server history, use the separate bot-based
+  `heino:export-history` tool instead.
 
 ## Advanced
 

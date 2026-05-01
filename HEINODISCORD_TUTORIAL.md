@@ -76,6 +76,20 @@ opencord/profiles/recommended-settings.json
 If the export has too few messages, scroll upward in the channel to load more
 history first, then run the command again.
 
+For a full server archive, use the bot-based exporter:
+
+```powershell
+cd "C:\Users\Joachim Csida\OpenCord"
+$env:HEINODISCORD_EXPORT_BOT_TOKEN = "YOUR_BOT_TOKEN"
+pnpm heino:export-history -- --guild-id YOUR_GUILD_ID
+```
+
+Full guide:
+
+```text
+HEINODISCORD_FULL_EXPORT.md
+```
+
 ## Enable Optional LastSeenTracker
 
 ```cmd
