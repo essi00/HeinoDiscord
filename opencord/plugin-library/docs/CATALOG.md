@@ -35,6 +35,8 @@ Token-free local channel export.
 
 - Use `/export-local-chat` for JSON.
 - Use `/export-local-chat format:markdown` for Markdown.
+- Use `/export-local-chat autoload:true seconds:120` to scroll-load more visible
+  history before exporting.
 - Exports the messages currently cached/loaded by the running Discord client.
 - Does not ask for, read, store, or display a Discord token.
 - Does not call Discord's history API or fetch messages that are not already

@@ -101,7 +101,11 @@ Commands:
 ```text
 /export-local-chat
 /export-local-chat format:markdown
+/export-local-chat autoload:true seconds:120
 ```
+
+The `autoload:true` option keeps everything token-free. It only scrolls the
+currently open chat to load more visible history into the local client cache.
 
 For all accessible history across a server, use the bot-based full exporter in
 `HEINODISCORD_FULL_EXPORT.md`.

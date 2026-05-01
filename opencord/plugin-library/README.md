@@ -38,7 +38,7 @@ Install advanced plugins too:
 
 - `QuickTemplates`: local support/chat templates. Type `;;hello` or use `/qt`.
 - `LinkSafety`: blocks obvious phishing-style links before sending.
-- `LocalChatExporter`: token-free export of the current cached channel via `/export-local-chat`.
+- `LocalChatExporter`: token-free export of the current loaded channel via `/export-local-chat`; use `autoload:true` to scroll-load more visible history first.
 - `TranslatorPro`: extended translation tools.
 - `LastSeenTracker`: local presence/last-seen tracking. Advanced/privacy-sensitive.
 - `SilentEdit`: advanced opt-in message edit workflow.
@@ -56,7 +56,9 @@ explicit plugin name or `-IncludeAdvanced`.
 
 `LocalChatExporter` intentionally has no token field. It exports only messages
 already loaded in your running Discord client. It reads the local message cache,
-then creates a browser download as JSON or Markdown.
+then creates a browser download as JSON or Markdown. Its `autoload:true` mode
+keeps the current chat open and repeatedly scrolls upward to ask Discord's own
+UI to load more history before exporting.
 
 ## Publishing
 

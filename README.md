@@ -26,6 +26,7 @@ the export, scroll/load more of the channel first and run:
 ```text
 /export-local-chat
 /export-local-chat format:markdown
+/export-local-chat autoload:true seconds:120
 ```
 
 For full channel history, use the bot-based exporter instead:

@@ -16,6 +16,8 @@ class of risk by design.
 ## Supported Export Paths
 
 - `LocalChatExporter`: exports messages already loaded in the running client.
+  Its `autoload:true` option scroll-loads more visible history without reading
+  or accepting a Discord user token.
 - `heino:import-data-package`: imports Discord's official account data package
   into local HTML, JSON, and Markdown archives.
 - `heino:export-history`: uses a bot token for server channels where the bot has

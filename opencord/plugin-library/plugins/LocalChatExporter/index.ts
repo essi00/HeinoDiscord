@@ -65,6 +65,87 @@ function getCachedMessages(channelId: string) {
     return uniqueMessages(raw);
 }
 
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getScrollableParent(element: Element | null) {
+    for (let current = element?.parentElement; current; current = current.parentElement) {
+        const style = getComputedStyle(current);
+        if (current.scrollHeight > current.clientHeight && /(auto|scroll)/.test(`${style.overflowY}${style.overflow}`)) {
+            return current;
+        }
+    }
+
+    return null;
+}
+
+function findMessageScroller() {
+    const candidates = [
+        document.querySelector('[data-list-id="chat-messages"]'),
+        document.querySelector('[aria-label*="Messages"]'),
+        document.querySelector('[class*="messagesWrapper"] [class*="scroller"]'),
+        ...Array.from(document.querySelectorAll('[class*="managedReactiveScroller"], [class*="scrollerBase"]'))
+    ];
+
+    for (const candidate of candidates) {
+        if (!(candidate instanceof HTMLElement)) continue;
+
+        const direct = candidate.scrollHeight > candidate.clientHeight ? candidate : null;
+        const parent = getScrollableParent(candidate);
+        const scroller = direct ?? parent;
+
+        if (scroller && scroller.querySelector('[id^="chat-messages-"], [class*="messageListItem"]')) {
+            return scroller;
+        }
+    }
+
+    return null;
+}
+
+async function autoloadVisibleHistory(channelId: string, seconds: number) {
+    const scroller = findMessageScroller();
+    if (!scroller) {
+        return {
+            ok: false,
+            before: getCachedMessages(channelId).length,
+            after: getCachedMessages(channelId).length,
+            reason: "Could not find the visible chat scroller. Open the target DM/channel and try again."
+        };
+    }
+
+    const startedAt = Date.now();
+    const before = getCachedMessages(channelId).length;
+    let lastCount = before;
+    let stablePasses = 0;
+    let passes = 0;
+
+    while (Date.now() - startedAt < seconds * 1000) {
+        scroller.scrollTop = 0;
+        scroller.dispatchEvent(new WheelEvent("wheel", { deltaY: -2500, bubbles: true, cancelable: true }));
+        passes++;
+
+        await sleep(900);
+
+        const count = getCachedMessages(channelId).length;
+        if (count <= lastCount) {
+            stablePasses++;
+        } else {
+            stablePasses = 0;
+            lastCount = count;
+        }
+
+        if (stablePasses >= 6) break;
+    }
+
+    return {
+        ok: true,
+        before,
+        after: getCachedMessages(channelId).length,
+        passes
+    };
+}
+
 function toExportedMessage(message: Message, guildId?: string): ExportedMessage {
     return {
         id: message.id,
@@ -200,23 +281,52 @@ export default definePlugin({
     commands: [
         {
             name: "export-local-chat",
-            description: "Export currently cached messages from this channel without using a Discord token",
+            description: "Export locally loaded messages from this channel without using a Discord token",
             inputType: ApplicationCommandInputType.BUILT_IN,
-            options: [{
-                name: "format",
-                description: "Export format: json or markdown",
-                type: ApplicationCommandOptionType.STRING,
-                required: false
-            }],
-            execute: (opts, ctx) => {
+            options: [
+                {
+                    name: "format",
+                    description: "Export format: json or markdown",
+                    type: ApplicationCommandOptionType.STRING,
+                    required: false
+                },
+                {
+                    name: "autoload",
+                    description: "Scroll upward first to load more visible history before exporting",
+                    type: ApplicationCommandOptionType.BOOLEAN,
+                    required: false
+                },
+                {
+                    name: "seconds",
+                    description: "How long autoload should try to load older visible history",
+                    type: ApplicationCommandOptionType.INTEGER,
+                    required: false
+                }
+            ],
+            execute: async (opts, ctx) => {
                 const rawFormat = String(findOption(opts, "format", "json")).toLowerCase();
                 const format: ExportFormat = rawFormat === "markdown" || rawFormat === "md" ? "markdown" : "json";
+                const autoload = Boolean(findOption(opts, "autoload", false));
+                const seconds = Math.max(5, Math.min(600, Number(findOption(opts, "seconds", 45)) || 45));
+
+                let autoloadMessage = "";
+                if (autoload) {
+                    sendBotMessage(ctx.channel.id, {
+                        content: `Loading older visible history for up to ${seconds}s. Keep this DM/channel open and do not switch chats.`
+                    });
+
+                    const result = await autoloadVisibleHistory(ctx.channel.id, seconds);
+                    autoloadMessage = result.ok
+                        ? ` Loaded cache from ${result.before} to ${result.after} message(s).`
+                        : ` ${result.reason}`;
+                }
+
                 const count = exportChannel(ctx.channel.id, format);
 
                 sendBotMessage(ctx.channel.id, {
                     content: count
-                        ? `Exported ${count} cached message(s) as ${format}.`
-                        : "No cached messages found. Scroll/load the channel first, then run the command again."
+                        ? `Exported ${count} locally loaded message(s) as ${format}.${autoloadMessage}`
+                        : `No cached messages found.${autoloadMessage} Scroll/load the channel first, then run the command again.`
                 });
             }
         }

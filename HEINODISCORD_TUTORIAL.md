@@ -66,6 +66,8 @@ opencord/profiles/recommended-settings.json
 - It registers the slash command `/export-local-chat`.
 - It reads the current channel from Discord's already-loaded `MessageStore`.
 - It exports only messages currently cached in the running client.
+- With `autoload:true`, it repeatedly scrolls upward in the visible chat first
+  so Discord loads more local history before the export.
 - It writes a local browser download as JSON by default.
 - It supports Markdown with `/export-local-chat format:markdown`.
 - It includes message ids, channel/guild info, author ids/names, timestamps,
@@ -75,6 +77,14 @@ opencord/profiles/recommended-settings.json
 
 If the export has too few messages, scroll upward in the channel to load more
 history first, then run the command again.
+
+Deep local export:
+
+```text
+/export-local-chat autoload:true seconds:120
+```
+
+Keep the target DM/channel open while it runs.
 
 For a full server archive, use the bot-based exporter:
 
