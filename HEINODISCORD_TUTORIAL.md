@@ -58,6 +58,15 @@ Recommended custom plugins:
 - `AttachmentIndex`
 - `PrivacyScan`
 
+These HeinoDiscord library plugins are managed in Discord under:
+
+```text
+User Settings -> HeinoDiscord Settings -> Heino Plugins
+```
+
+The regular `Plugins` tab is now reserved for the broader compatibility plugin
+ecosystem.
+
 Recommended built-in plugins are enabled through:
 
 ```text

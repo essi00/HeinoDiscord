@@ -131,3 +131,11 @@ The recommended library now includes local-only data helpers:
 They use the loaded in-memory message cache and local browser downloads. They do
 not read account tokens, call Discord's history API, or send exports to a cloud
 service.
+
+Inside Discord, HeinoDiscord library plugins are shown under:
+
+```text
+User Settings -> HeinoDiscord Settings -> Heino Plugins
+```
+
+The regular `Plugins` tab is kept for the wider compatibility plugin ecosystem.

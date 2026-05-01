@@ -27,6 +27,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { HeadingTertiary } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
+import { HEINO_LIBRARY_PLUGIN_NAME_SET } from "@components/settings/tabs/heinoLibrary/library";
 import { ChangeList } from "@utils/ChangeList";
 import { classNameFactory } from "@utils/css";
 import { isTruthy } from "@utils/guards";
@@ -222,6 +223,9 @@ function PluginSettings() {
     const showApi = searchValue.status === SearchStatus.API_PLUGINS;
     for (const p of sortedPlugins) {
         if (p.hidden || (!p.options && p.name.endsWith("API") && !showApi))
+            continue;
+
+        if (HEINO_LIBRARY_PLUGIN_NAME_SET.has(p.name))
             continue;
 
         if (!pluginFilter(p)) continue;

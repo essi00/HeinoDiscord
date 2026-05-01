@@ -1,0 +1,61 @@
+.vc-heino-library-intro {
+    margin-bottom: 16px;
+}
+
+.vc-heino-library-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.vc-heino-library-footer {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.vc-heino-library-meta {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.vc-heino-library-command-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.vc-heino-library-command {
+    background: var(--background-modifier-accent);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    color: var(--text-normal);
+    font-family: var(--font-code);
+    font-size: 12px;
+    line-height: 18px;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 2px 6px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vc-heino-library-info-button {
+    height: 24px;
+    width: 24px;
+    padding: 0;
+    background: transparent;
+    color: var(--icon-muted);
+    transition: color 0.2s ease;
+}
+
+.vc-heino-library-info-button:hover {
+    color: var(--interactive-icon-hover);
+}
+
+.vc-heino-library-info-icon:not(:hover, :focus) {
+    color: var(--text-muted);
+}

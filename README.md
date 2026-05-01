@@ -56,6 +56,14 @@ These commands operate only on messages already loaded in the running client and
 create local browser downloads. They do not use account tokens, upload data, or
 call Discord history APIs.
 
+HeinoDiscord library plugins are managed separately in Discord:
+
+```text
+User Settings -> HeinoDiscord Settings -> Heino Plugins
+```
+
+The regular `Plugins` tab remains for compatibility plugins.
+
 Start here:
 
 - [HeinoDiscord product guide](./HEINODISCORD.md)
