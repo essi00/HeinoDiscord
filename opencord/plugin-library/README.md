@@ -44,6 +44,10 @@ Install advanced plugins too:
 - `LinkCollector`: local link index export as JSON, CSV, or Markdown.
 - `AttachmentIndex`: local attachment metadata index export as JSON, CSV, or Markdown.
 - `PrivacyScan`: local sensitive-pattern scan with redacted samples and optional redacted report export.
+- `SupportQueueGuard`: local support ticket reminders for opened/read tickets that still need a reply.
+- `ScamShield`: local scam/RAT warning layer for fake support, dangerous files, suspicious links, and token-shaped strings.
+- `CustomerPrivacyGuard`: local outbound customer-data leak guard with an explicit `[allow-pii]` override.
+- `SecureSupportVault`: local AES-GCM encrypted support notes/drafts with auto-lock.
 - `TranslatorPro`: extended translation tools.
 - `LastSeenTracker`: local presence/last-seen tracking. Advanced/privacy-sensitive.
 - `SilentEdit`: advanced opt-in message edit workflow.
@@ -66,9 +70,14 @@ keeps the current chat open and repeatedly scrolls upward to ask Discord's own
 UI to load more history before exporting. The `seconds` option controls how long
 those fast scroll bursts keep running.
 
-The other local data plugins follow the same rule: they inspect only the
-currently loaded message cache and create local browser downloads. They do not
+The other local data/security plugins follow the same rule: they inspect only
+local client state and create local browser downloads when needed. They do not
 read account tokens, upload data, or call Discord history APIs.
+
+`SecureSupportVault` is client-side encryption for local notes and drafts, not
+Discord end-to-end encryption. It stores AES-GCM ciphertext locally and forgets
+the key when locked, but malware running on the same machine can still read what
+you display, type, or decrypt while the vault is unlocked.
 
 ## Publishing
 

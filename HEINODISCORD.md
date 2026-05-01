@@ -127,10 +127,20 @@ The recommended library now includes local-only data helpers:
 - `/collect-links`
 - `/attachment-index`
 - `/privacy-scan`
+- `/ticket-guard`
+- `/security-scan`
+- `/privacy-check`
+- `/secure-vault`
 
 They use the loaded in-memory message cache and local browser downloads. They do
 not read account tokens, call Discord's history API, or send exports to a cloud
 service.
+
+For support work, `SupportQueueGuard` reminds you about opened/read tickets that
+still need a reply, `ScamShield` warns about fake-support/RAT patterns, and
+`CustomerPrivacyGuard` blocks accidental customer-data leaks. `SecureSupportVault`
+encrypts local support notes/drafts with WebCrypto AES-GCM; it is local note
+encryption, not Discord E2EE.
 
 Inside Discord, HeinoDiscord library plugins are shown under:
 

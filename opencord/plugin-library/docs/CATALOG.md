@@ -96,6 +96,53 @@ Local privacy review for loaded messages.
 - Use `/privacy-scan export:true format:markdown` for a redacted local report.
 - No network requests.
 
+### SupportQueueGuard
+
+Local SLA helper for customer-service tickets.
+
+- Watches ticket-like DMs and channels you open or receive messages in.
+- Marks a ticket done when you send a reply.
+- Use `/ticket-guard action:status` to list open local tickets.
+- Use `/ticket-guard action:snooze hours:2` to pause reminders.
+- Use `/ticket-guard action:done` after handling a ticket outside Discord.
+- Stores reminder metadata locally; no token and no cloud sync.
+
+### ScamShield
+
+Local scam/RAT warning layer.
+
+- Warns on fake support/account-pressure language.
+- Warns on dangerous file links, raw IPs, punycode, lookalike domains, and
+  token-shaped strings.
+- Blocks risky outgoing messages unless you add `[allow-risk]`.
+- Use `/security-scan` to scan currently loaded messages.
+- No network requests.
+
+### CustomerPrivacyGuard
+
+Local outbound privacy guard for customer support work.
+
+- Blocks high-risk secrets like token-shaped strings, private keys, seed phrase
+  language, and payment-card-like numbers.
+- Blocks bursts of personal data such as email, phone, address, and postal-code
+  patterns.
+- Use `[allow-pii]` once when a send is intentional.
+- Use `/privacy-check text:...` to scan a snippet locally.
+- No network requests.
+
+### SecureSupportVault
+
+Local encrypted vault for support notes, draft snippets, order context, and
+customer details that should not sit in plaintext.
+
+- Use `/secure-vault action:unlock text:<passphrase>`.
+- Use `/secure-vault action:add key:<name> text:<secret note>`.
+- Use `/secure-vault action:read key:<name>`.
+- Uses PBKDF2-SHA-256 and AES-GCM via browser WebCrypto.
+- Stores ciphertext only in local IndexedDB.
+- This is not Discord E2EE. Decrypted text can still be seen by malware or
+  screen capture while displayed/unlocked.
+
 ## Advanced
 
 ### LastSeenTracker

@@ -57,6 +57,10 @@ Recommended custom plugins:
 - `LinkCollector`
 - `AttachmentIndex`
 - `PrivacyScan`
+- `SupportQueueGuard`
+- `ScamShield`
+- `CustomerPrivacyGuard`
+- `SecureSupportVault`
 
 These HeinoDiscord library plugins are managed in Discord under:
 
@@ -137,11 +141,19 @@ The recommended profile also includes token-free tools for loaded Discord data:
 /attachment-index format:json
 /privacy-scan
 /privacy-scan export:true format:markdown
+/ticket-guard action:status
+/security-scan
+/privacy-check text:customer@example.com
+/secure-vault action:unlock text:<passphrase>
 ```
 
 These tools run inside the client, inspect only messages already loaded in the
 current channel or DM, and create local browser downloads when exporting. They
 do not use a user token or upload chat data.
+
+Security note: `SecureSupportVault` encrypts only local notes/drafts stored by
+HeinoDiscord. It cannot make normal Discord messages end-to-end encrypted and it
+cannot protect decrypted text from malware that is already running on your PC.
 
 ## Enable Optional LastSeenTracker
 

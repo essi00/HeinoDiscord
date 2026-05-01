@@ -51,10 +51,17 @@ primary `HeinoDiscord.*` product surface:
 - `/collect-links`: local link index export as JSON, CSV, or Markdown.
 - `/attachment-index`: local attachment metadata index export.
 - `/privacy-scan`: local redacted sensitive-pattern scan and report export.
+- `/ticket-guard`: local support ticket reminder workflow.
+- `/security-scan`: local scam/RAT scan for loaded messages.
+- `/privacy-check`: local outbound customer-data check.
+- `/secure-vault`: local AES-GCM encrypted support note vault.
 
 These commands operate only on messages already loaded in the running client and
 create local browser downloads. They do not use account tokens, upload data, or
 call Discord history APIs.
+
+`SecureSupportVault` protects local notes/drafts at rest. It cannot hide normal
+Discord messages from Discord or from malware already running on the machine.
 
 HeinoDiscord library plugins are managed separately in Discord:
 

@@ -119,7 +119,11 @@
       "LocalSearch": { "enabled": true },
       "LinkCollector": { "enabled": true },
       "AttachmentIndex": { "enabled": true },
-      "PrivacyScan": { "enabled": true }
+      "PrivacyScan": { "enabled": true },
+      "SupportQueueGuard": { "enabled": true },
+      "ScamShield": { "enabled": true },
+      "CustomerPrivacyGuard": { "enabled": true },
+      "SecureSupportVault": { "enabled": true }
     },
     "uiElements": {
       "chatBarButtons": {},

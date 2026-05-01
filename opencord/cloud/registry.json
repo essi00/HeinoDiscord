@@ -66,6 +66,34 @@
       "recommended": true,
       "privacy": "local-only-redacted",
       "network": []
+    },
+    {
+      "name": "SupportQueueGuard",
+      "source": "opencord/plugin-library/plugins/SupportQueueGuard",
+      "recommended": true,
+      "privacy": "local-only-ticket-metadata",
+      "network": []
+    },
+    {
+      "name": "ScamShield",
+      "source": "opencord/plugin-library/plugins/ScamShield",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "CustomerPrivacyGuard",
+      "source": "opencord/plugin-library/plugins/CustomerPrivacyGuard",
+      "recommended": true,
+      "privacy": "local-only-outgoing-scan",
+      "network": []
+    },
+    {
+      "name": "SecureSupportVault",
+      "source": "opencord/plugin-library/plugins/SecureSupportVault",
+      "recommended": true,
+      "privacy": "local-only-aes-gcm-ciphertext",
+      "network": []
     }
   ]
 }

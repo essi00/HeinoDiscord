@@ -57,6 +57,26 @@ export const HEINO_LIBRARY_PLUGINS = [
         commands: ["/privacy-scan", "/privacy-scan export:true format:markdown"]
     },
     {
+        name: "SupportQueueGuard",
+        category: "Support SLA",
+        commands: ["/ticket-guard action:status", "/ticket-guard action:snooze hours:2"]
+    },
+    {
+        name: "ScamShield",
+        category: "Security",
+        commands: ["/security-scan", "[allow-risk] override"]
+    },
+    {
+        name: "CustomerPrivacyGuard",
+        category: "Privacy",
+        commands: ["/privacy-check text:<text>", "[allow-pii] override"]
+    },
+    {
+        name: "SecureSupportVault",
+        category: "Encrypted Local Vault",
+        commands: ["/secure-vault action:unlock", "/secure-vault action:add", "/secure-vault action:read"]
+    },
+    {
         name: "LastSeenTracker",
         category: "Advanced Local Insight",
         commands: ["local observed presence history"]

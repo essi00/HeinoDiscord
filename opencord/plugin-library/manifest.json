@@ -101,6 +101,50 @@
       "privacy": "Scans locally and redacts samples; no network requests or raw secret export."
     },
     {
+      "name": "SupportQueueGuard",
+      "source": "plugins/SupportQueueGuard",
+      "target": "SupportQueueGuard",
+      "category": "support",
+      "recommended": true,
+      "advanced": false,
+      "description": "Local support ticket SLA reminders for opened tickets, incoming messages, snooze, done, and ignore workflows.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Stores ticket reminder metadata locally in HeinoDiscordData; no message content or token is uploaded."
+    },
+    {
+      "name": "ScamShield",
+      "source": "plugins/ScamShield",
+      "target": "ScamShield",
+      "category": "security",
+      "recommended": true,
+      "advanced": false,
+      "description": "Local scam/RAT guard for fake support messages, suspicious links, dangerous file links, and token-shaped secrets.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Scans loaded/incoming message text locally; no network lookups."
+    },
+    {
+      "name": "CustomerPrivacyGuard",
+      "source": "plugins/CustomerPrivacyGuard",
+      "target": "CustomerPrivacyGuard",
+      "category": "privacy",
+      "recommended": true,
+      "advanced": false,
+      "description": "Blocks accidental outgoing customer-data and account-secret leaks unless explicitly overridden.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Scans only the outgoing message locally before send/edit."
+    },
+    {
+      "name": "SecureSupportVault",
+      "source": "plugins/SecureSupportVault",
+      "target": "SecureSupportVault",
+      "category": "security",
+      "recommended": true,
+      "advanced": false,
+      "description": "Local AES-GCM encrypted support note and draft vault with auto-lock.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Stores only AES-GCM ciphertext locally in IndexedDB; the passphrase is never stored."
+    },
+    {
       "name": "LastSeenTracker",
       "source": "plugins/lastSeenTracker",
       "target": "lastSeenTracker",
