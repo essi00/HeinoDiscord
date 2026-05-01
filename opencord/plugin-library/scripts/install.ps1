@@ -135,6 +135,9 @@ if ($Build) {
     Push-Location $VencordRoot
     try {
         pnpm run build:discord
+        if ($LASTEXITCODE -ne 0) {
+            throw "pnpm run build:discord failed with exit code $LASTEXITCODE"
+        }
     } finally {
         Pop-Location
     }
@@ -147,6 +150,9 @@ if ($Patch) {
             node "scripts\patchAllDiscordRoaming.mjs"
         } else {
             pnpm inject
+        }
+        if ($LASTEXITCODE -ne 0) {
+            throw "Patch failed with exit code $LASTEXITCODE"
         }
     } finally {
         Pop-Location

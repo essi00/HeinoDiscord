@@ -17,8 +17,14 @@ try {
     Start-Sleep -Seconds 3
 
     pnpm run build:discord
+    if ($LASTEXITCODE -ne 0) {
+        throw "pnpm run build:discord failed with exit code $LASTEXITCODE"
+    }
 
     node "opencord\scripts\patch-discord.mjs" --all
+    if ($LASTEXITCODE -ne 0) {
+        throw "OpenCord Discord patch failed with exit code $LASTEXITCODE"
+    }
 
     if (-not $NoRestart) {
         $stableUpdater = Join-Path $env:LOCALAPPDATA "Discord\Update.exe"

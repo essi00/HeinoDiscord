@@ -227,11 +227,18 @@ export const gitRemotePlugin = {
         build.onLoad({ filter, namespace: "git-remote" }, async () => {
             let remote = process.env.VENCORD_REMOTE;
             if (!remote) {
-                const res = await promisify(exec)("git remote get-url origin", { encoding: "utf-8" });
-                remote = res.stdout.trim()
-                    .replace("https://github.com/", "")
+                for (const name of ["origin", "upstream"]) {
+                    try {
+                        const res = await promisify(exec)(`git remote get-url ${name}`, { encoding: "utf-8" });
+                        remote = res.stdout.trim();
+                        break;
+                    } catch { }
+                }
+
+                remote = remote
+                    ?.replace("https://github.com/", "")
                     .replace("git@github.com:", "")
-                    .replace(/.git$/, "");
+                    .replace(/.git$/, "") ?? "";
             }
 
             return { contents: `export default "${remote}"` };
