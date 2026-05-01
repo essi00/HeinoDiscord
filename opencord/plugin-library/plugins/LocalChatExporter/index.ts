@@ -80,27 +80,66 @@ function getScrollableParent(element: Element | null) {
     return null;
 }
 
+function isVisible(element: HTMLElement) {
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+}
+
+function isScrollable(element: HTMLElement) {
+    const style = getComputedStyle(element);
+    return element.scrollHeight > element.clientHeight && /(auto|scroll)/.test(`${style.overflowY}${style.overflow}`);
+}
+
+function scoreScroller(element: HTMLElement) {
+    const messageCount = element.querySelectorAll('[id^="chat-messages-"], [class*="messageListItem"]').length;
+    return messageCount * 100_000 + element.scrollHeight + element.clientHeight;
+}
+
 function findMessageScroller() {
-    const candidates = [
+    const candidates = new Set<HTMLElement>();
+    const knownCandidates = [
         document.querySelector('[data-list-id="chat-messages"]'),
         document.querySelector('[aria-label*="Messages"]'),
         document.querySelector('[class*="messagesWrapper"] [class*="scroller"]'),
         ...Array.from(document.querySelectorAll('[class*="managedReactiveScroller"], [class*="scrollerBase"]'))
     ];
 
-    for (const candidate of candidates) {
+    for (const candidate of knownCandidates) {
         if (!(candidate instanceof HTMLElement)) continue;
 
-        const direct = candidate.scrollHeight > candidate.clientHeight ? candidate : null;
-        const parent = getScrollableParent(candidate);
-        const scroller = direct ?? parent;
+        if (isScrollable(candidate)) candidates.add(candidate);
 
-        if (scroller && scroller.querySelector('[id^="chat-messages-"], [class*="messageListItem"]')) {
-            return scroller;
+        const parent = getScrollableParent(candidate);
+        if (parent) candidates.add(parent);
+    }
+
+    for (const messageElement of document.querySelectorAll('[id^="chat-messages-"], [class*="messageListItem"]')) {
+        for (let current = messageElement.parentElement; current; current = current.parentElement) {
+            if (isScrollable(current)) candidates.add(current);
         }
     }
 
-    return null;
+    return [...candidates]
+        .filter(element => isVisible(element))
+        .filter(element => element.querySelector('[id^="chat-messages-"], [class*="messageListItem"]'))
+        .sort((a, b) => scoreScroller(b) - scoreScroller(a))[0] ?? null;
+}
+
+function scrollUpBurst(scroller: HTMLElement) {
+    const distance = Math.max(scroller.clientHeight * 2.5, 2200);
+
+    scroller.focus?.();
+    for (let i = 0; i < 5; i++) {
+        scroller.scrollBy({ top: -distance, behavior: "instant" });
+        scroller.scrollTop = Math.max(0, scroller.scrollTop - distance);
+        scroller.dispatchEvent(new WheelEvent("wheel", {
+            deltaY: -distance,
+            deltaMode: WheelEvent.DOM_DELTA_PIXEL,
+            bubbles: true,
+            cancelable: true,
+            view: window
+        }));
+    }
 }
 
 async function autoloadVisibleHistory(channelId: string, seconds: number) {
@@ -117,31 +156,28 @@ async function autoloadVisibleHistory(channelId: string, seconds: number) {
     const startedAt = Date.now();
     const before = getCachedMessages(channelId).length;
     let lastCount = before;
-    let stablePasses = 0;
+    let gained = 0;
     let passes = 0;
 
     while (Date.now() - startedAt < seconds * 1000) {
-        scroller.scrollTop = 0;
-        scroller.dispatchEvent(new WheelEvent("wheel", { deltaY: -2500, bubbles: true, cancelable: true }));
+        scrollUpBurst(scroller);
         passes++;
 
-        await sleep(900);
+        await sleep(250);
 
         const count = getCachedMessages(channelId).length;
-        if (count <= lastCount) {
-            stablePasses++;
-        } else {
-            stablePasses = 0;
+        if (count > lastCount) {
+            gained += count - lastCount;
             lastCount = count;
         }
-
-        if (stablePasses >= 6) break;
     }
 
     return {
         ok: true,
         before,
         after: getCachedMessages(channelId).length,
+        gained,
+        durationSeconds: Math.round((Date.now() - startedAt) / 1000),
         passes
     };
 }
@@ -317,7 +353,7 @@ export default definePlugin({
 
                     const result = await autoloadVisibleHistory(ctx.channel.id, seconds);
                     autoloadMessage = result.ok
-                        ? ` Loaded cache from ${result.before} to ${result.after} message(s).`
+                        ? ` Ran for ${result.durationSeconds}s over ${result.passes} scroll burst(s). Loaded cache from ${result.before} to ${result.after} message(s).`
                         : ` ${result.reason}`;
                 }
 

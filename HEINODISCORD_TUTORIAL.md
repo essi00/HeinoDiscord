@@ -84,7 +84,9 @@ Deep local export:
 /export-local-chat autoload:true seconds:120
 ```
 
-Keep the target DM/channel open while it runs.
+Keep the target DM/channel open while it runs. The autoload step now runs for
+the requested duration and uses repeated fast scroll bursts instead of stopping
+after a few stable cache checks.
 
 For a full server archive, use the bot-based exporter:
 

@@ -58,7 +58,8 @@ explicit plugin name or `-IncludeAdvanced`.
 already loaded in your running Discord client. It reads the local message cache,
 then creates a browser download as JSON or Markdown. Its `autoload:true` mode
 keeps the current chat open and repeatedly scrolls upward to ask Discord's own
-UI to load more history before exporting.
+UI to load more history before exporting. The `seconds` option controls how long
+those fast scroll bursts keep running.
 
 ## Publishing
 

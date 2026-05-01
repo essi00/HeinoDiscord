@@ -29,6 +29,9 @@ the export, scroll/load more of the channel first and run:
 /export-local-chat autoload:true seconds:120
 ```
 
+The `autoload:true` mode keeps the current chat open and scrolls upward for the
+requested duration before exporting the locally loaded message cache.
+
 For full channel history, use the bot-based exporter instead:
 [Full history export](./HEINODISCORD_FULL_EXPORT.md).
 
