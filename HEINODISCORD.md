@@ -81,13 +81,17 @@ opencord/cloud/registry.json
 You can host that registry on GitHub Pages or raw GitHub for a public plugin
 catalog. Users still build from source, which keeps the system inspectable.
 
-New plugins should use:
+New HeinoDiscord plugins should use the primary runtime surface:
 
 ```text
 HeinoDiscord.Api
 HeinoDiscord.Plugins
 HeinoDiscord.Webpack
 ```
+
+The Vencord global is kept only as an adapter for existing community plugins.
+The HeinoDiscord product pieces now use their own installer, registry, data
+folder, release package, patch entrypoint, and public `HeinoDiscord.*` identity.
 
 ## LocalChatExporter
 
@@ -113,3 +117,17 @@ For all accessible history across a server, use the bot-based full exporter in
 For DMs without a bot, import Discord's official data package with
 `pnpm heino:import-data-package -- --input <package.zip>`. See
 `HEINODISCORD_DATA_PACKAGE_IMPORT.md`.
+
+## Local Data Plugins
+
+The recommended library now includes local-only data helpers:
+
+- `/chat-stats`
+- `/local-search`
+- `/collect-links`
+- `/attachment-index`
+- `/privacy-scan`
+
+They use the loaded in-memory message cache and local browser downloads. They do
+not read account tokens, call Discord's history API, or send exports to a cloud
+service.

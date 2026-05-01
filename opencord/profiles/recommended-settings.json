@@ -114,7 +114,12 @@
       "QuickTemplates": { "enabled": true },
       "LinkSafety": { "enabled": true },
       "TranslatorPro": { "enabled": true, "autoTranslate": false },
-      "LocalChatExporter": { "enabled": true }
+      "LocalChatExporter": { "enabled": true },
+      "ChatStats": { "enabled": true },
+      "LocalSearch": { "enabled": true },
+      "LinkCollector": { "enabled": true },
+      "AttachmentIndex": { "enabled": true },
+      "PrivacyScan": { "enabled": true }
     },
     "uiElements": {
       "chatBarButtons": {},

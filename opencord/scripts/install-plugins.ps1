@@ -25,7 +25,7 @@ $PluginNames = @(
     }
 )
 
-$argsList = @("-VencordRoot", $OpenCordRoot)
+$argsList = @("-OpenCordRoot", $OpenCordRoot)
 
 if ($PluginNames.Count) {
     $argsList += "-Plugins"

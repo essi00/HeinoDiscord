@@ -39,6 +39,11 @@ Install advanced plugins too:
 - `QuickTemplates`: local support/chat templates. Type `;;hello` or use `/qt`.
 - `LinkSafety`: blocks obvious phishing-style links before sending.
 - `LocalChatExporter`: token-free export of the current loaded channel via `/export-local-chat`; use `autoload:true` to scroll-load more visible history first.
+- `ChatStats`: local stats for loaded messages with top authors, links, attachments, embeds, reactions, and busiest loaded hour.
+- `LocalSearch`: local loaded-message search with JSON or Markdown export.
+- `LinkCollector`: local link index export as JSON, CSV, or Markdown.
+- `AttachmentIndex`: local attachment metadata index export as JSON, CSV, or Markdown.
+- `PrivacyScan`: local sensitive-pattern scan with redacted samples and optional redacted report export.
 - `TranslatorPro`: extended translation tools.
 - `LastSeenTracker`: local presence/last-seen tracking. Advanced/privacy-sensitive.
 - `SilentEdit`: advanced opt-in message edit workflow.
@@ -60,6 +65,10 @@ then creates a browser download as JSON or Markdown. Its `autoload:true` mode
 keeps the current chat open and repeatedly scrolls upward to ask Discord's own
 UI to load more history before exporting. The `seconds` option controls how long
 those fast scroll bursts keep running.
+
+The other local data plugins follow the same rule: they inspect only the
+currently loaded message cache and create local browser downloads. They do not
+read account tokens, upload data, or call Discord history APIs.
 
 ## Publishing
 

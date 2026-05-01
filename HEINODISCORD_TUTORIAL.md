@@ -52,6 +52,11 @@ Recommended custom plugins:
 - `LinkSafety`
 - `TranslatorPro`
 - `LocalChatExporter`
+- `ChatStats`
+- `LocalSearch`
+- `LinkCollector`
+- `AttachmentIndex`
+- `PrivacyScan`
 
 Recommended built-in plugins are enabled through:
 
@@ -111,6 +116,23 @@ pnpm heino:import-data-package -- --input "C:\Path\To\discord-data-package.zip"
 That path does not use a token, but Discord's package only includes messages
 sent by your account. It writes local HTML, JSON, and Markdown archives by
 default.
+
+## Local Data Tools
+
+The recommended profile also includes token-free tools for loaded Discord data:
+
+```text
+/chat-stats
+/local-search query:invoice format:markdown
+/collect-links format:csv
+/attachment-index format:json
+/privacy-scan
+/privacy-scan export:true format:markdown
+```
+
+These tools run inside the client, inspect only messages already loaded in the
+current channel or DM, and create local browser downloads when exporting. They
+do not use a user token or upload chat data.
 
 ## Enable Optional LastSeenTracker
 

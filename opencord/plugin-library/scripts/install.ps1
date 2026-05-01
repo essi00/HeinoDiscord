@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$VencordRoot = (Join-Path $env:USERPROFILE "Vencord"),
+    [Alias("VencordRoot")]
+    [string]$OpenCordRoot = (Join-Path $env:USERPROFILE "OpenCord"),
     [string[]]$Plugins = @(),
     [switch]$Recommended,
     [switch]$All,
@@ -16,16 +17,17 @@ $ErrorActionPreference = "Stop"
 $LibraryRoot = Split-Path -Parent (Split-Path -Parent $PSCommandPath)
 $ManifestPath = Join-Path $LibraryRoot "manifest.json"
 $Manifest = Get-Content -LiteralPath $ManifestPath -Raw | ConvertFrom-Json
-$UserPluginsDir = Join-Path $VencordRoot "src\userplugins"
-$StatePath = Join-Path $UserPluginsDir ".open-vencord-plugin-library.json"
+$UserPluginsDir = Join-Path $OpenCordRoot "src\userplugins"
+$StatePath = Join-Path $UserPluginsDir ".heinodiscord-plugin-library.json"
+$LegacyStatePath = Join-Path $UserPluginsDir ".open-vencord-plugin-library.json"
 $PluginNames = @(
     foreach ($pluginName in $Plugins) {
         $pluginName -split "," | Where-Object { $_.Trim() } | ForEach-Object { $_.Trim() }
     }
 )
 
-if (-not (Test-Path -LiteralPath (Join-Path $VencordRoot "package.json"))) {
-    throw "Vencord root not found: $VencordRoot"
+if (-not (Test-Path -LiteralPath (Join-Path $OpenCordRoot "package.json"))) {
+    throw "OpenCord root not found: $OpenCordRoot"
 }
 
 New-Item -ItemType Directory -Force -Path $UserPluginsDir | Out-Null
@@ -44,10 +46,22 @@ function Get-PluginByName {
 
 if ($All) {
     $selected = @($Manifest.plugins | Where-Object { $IncludeAdvanced -or -not $_.advanced })
-} elseif ($Recommended) {
-    $selected = @($Manifest.plugins | Where-Object { $_.recommended -and ($IncludeAdvanced -or -not $_.advanced) })
-} elseif ($PluginNames.Count -gt 0) {
-    $selected = @($PluginNames | ForEach-Object { Get-PluginByName $_ })
+} elseif ($Recommended -or $PluginNames.Count -gt 0) {
+    $selected = @()
+
+    if ($Recommended) {
+        $selected += @($Manifest.plugins | Where-Object { $_.recommended -and ($IncludeAdvanced -or -not $_.advanced) })
+    }
+
+    if ($PluginNames.Count -gt 0) {
+        $selected += @($PluginNames | ForEach-Object { Get-PluginByName $_ })
+    }
+
+    $byName = [ordered]@{}
+    foreach ($plugin in $selected) {
+        $byName[$plugin.name.ToLowerInvariant()] = $plugin
+    }
+    $selected = @($byName.Values)
 } else {
     $available = $Manifest.plugins | ForEach-Object {
         $flag = if ($_.advanced) { "advanced" } elseif ($_.recommended) { "recommended" } else { "optional" }
@@ -65,7 +79,7 @@ $selectedTargets = @($selected | Select-Object -ExpandProperty target)
 if ($PruneUserPlugins) {
     Write-Host "Pruning unmanaged userplugins. Only selected library plugins will remain."
     foreach ($item in Get-ChildItem -LiteralPath $UserPluginsDir -Force) {
-        if ($item.Name -eq ".open-vencord-plugin-library.json") {
+        if ($item.Name -in @(".heinodiscord-plugin-library.json", ".open-vencord-plugin-library.json")) {
             continue
         }
 
@@ -78,8 +92,9 @@ if ($PruneUserPlugins) {
     }
 }
 
-if ($CleanManaged -and (Test-Path -LiteralPath $StatePath)) {
-    $state = Get-Content -LiteralPath $StatePath -Raw | ConvertFrom-Json
+if ($CleanManaged -and ((Test-Path -LiteralPath $StatePath) -or (Test-Path -LiteralPath $LegacyStatePath))) {
+    $stateSource = if (Test-Path -LiteralPath $StatePath) { $StatePath } else { $LegacyStatePath }
+    $state = Get-Content -LiteralPath $stateSource -Raw | ConvertFrom-Json
     foreach ($installed in @($state.installed)) {
         if ($selectedNames -contains $installed.name) {
             continue
@@ -130,9 +145,12 @@ $stateObject = [pscustomobject]@{
 $json = $stateObject | ConvertTo-Json -Depth 10
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($StatePath, $json, $utf8NoBom)
+if (Test-Path -LiteralPath $LegacyStatePath) {
+    Remove-Item -LiteralPath $LegacyStatePath -Force
+}
 
 if ($Build) {
-    Push-Location $VencordRoot
+    Push-Location $OpenCordRoot
     try {
         pnpm run build:discord
         if ($LASTEXITCODE -ne 0) {
@@ -144,11 +162,11 @@ if ($Build) {
 }
 
 if ($Patch) {
-    Push-Location $VencordRoot
+    Push-Location $OpenCordRoot
     try {
-        if (Test-Path -LiteralPath (Join-Path $VencordRoot "opencord\scripts\build-and-patch.ps1")) {
+        if (Test-Path -LiteralPath (Join-Path $OpenCordRoot "opencord\scripts\build-and-patch.ps1")) {
             powershell.exe -NoProfile -ExecutionPolicy Bypass -File "opencord\scripts\build-and-patch.ps1"
-        } elseif (Test-Path -LiteralPath (Join-Path $VencordRoot "scripts\patchAllDiscordRoaming.mjs")) {
+        } elseif (Test-Path -LiteralPath (Join-Path $OpenCordRoot "scripts\patchAllDiscordRoaming.mjs")) {
             node "scripts\patchAllDiscordRoaming.mjs"
         } else {
             pnpm inject

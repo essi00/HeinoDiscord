@@ -46,6 +46,61 @@
       "privacy": "Exports only messages already loaded in the current Discord client. It never reads or stores an account token."
     },
     {
+      "name": "ChatStats",
+      "source": "plugins/ChatStats",
+      "target": "ChatStats",
+      "category": "local-insight",
+      "recommended": true,
+      "advanced": false,
+      "description": "Local statistics for currently loaded channel or DM messages.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Analyzes only messages already loaded in the current Discord client."
+    },
+    {
+      "name": "LocalSearch",
+      "source": "plugins/LocalSearch",
+      "target": "LocalSearch",
+      "category": "productivity",
+      "recommended": true,
+      "advanced": false,
+      "description": "Searches currently loaded messages locally and exports matching results.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Searches only the local in-memory message cache."
+    },
+    {
+      "name": "LinkCollector",
+      "source": "plugins/LinkCollector",
+      "target": "LinkCollector",
+      "category": "archive",
+      "recommended": true,
+      "advanced": false,
+      "description": "Exports links from currently loaded messages as JSON, CSV, or Markdown.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Exports only links already visible in loaded local messages."
+    },
+    {
+      "name": "AttachmentIndex",
+      "source": "plugins/AttachmentIndex",
+      "target": "AttachmentIndex",
+      "category": "archive",
+      "recommended": true,
+      "advanced": false,
+      "description": "Exports attachment metadata from currently loaded messages.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Exports only attachment metadata already present in loaded local messages."
+    },
+    {
+      "name": "PrivacyScan",
+      "source": "plugins/PrivacyScan",
+      "target": "PrivacyScan",
+      "category": "privacy",
+      "recommended": true,
+      "advanced": false,
+      "description": "Locally scans loaded messages for sensitive-data patterns with redacted output.",
+      "dependencies": ["CommandsAPI"],
+      "privacy": "Scans locally and redacts samples; no network requests or raw secret export."
+    },
+    {
       "name": "LastSeenTracker",
       "source": "plugins/lastSeenTracker",
       "target": "lastSeenTracker",

@@ -41,6 +41,21 @@ token, but it is limited to messages Discord includes in your package.
 
 Export safety policy: [HeinoDiscord export safety](./HEINODISCORD_EXPORT_SAFETY.md).
 
+## Local Data Plugins
+
+The recommended HeinoDiscord profile now includes local data tools built for the
+primary `HeinoDiscord.*` product surface:
+
+- `/chat-stats`: loaded-message stats, top authors, links, media, reactions.
+- `/local-search`: local loaded-message search with JSON or Markdown export.
+- `/collect-links`: local link index export as JSON, CSV, or Markdown.
+- `/attachment-index`: local attachment metadata index export.
+- `/privacy-scan`: local redacted sensitive-pattern scan and report export.
+
+These commands operate only on messages already loaded in the running client and
+create local browser downloads. They do not use account tokens, upload data, or
+call Discord history APIs.
+
 Start here:
 
 - [HeinoDiscord product guide](./HEINODISCORD.md)

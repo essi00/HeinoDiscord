@@ -152,7 +152,7 @@ internal static class HeinoDiscordInstaller
             Run(root, "pnpm install");
 
         string pluginCommand = withLastSeen
-            ? "pnpm opencord:plugins -- -Plugins \"QuickTemplates,LinkSafety,TranslatorPro,LocalChatExporter,LastSeenTracker\" -PruneUserPlugins"
+            ? "pnpm opencord:plugins -- -Recommended -Plugins \"LastSeenTracker\" -PruneUserPlugins"
             : "pnpm opencord:plugins -- -Recommended -PruneUserPlugins";
 
         Run(root, pluginCommand);

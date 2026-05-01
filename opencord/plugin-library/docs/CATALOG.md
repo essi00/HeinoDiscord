@@ -47,6 +47,55 @@ Token-free local channel export.
 - For complete server history, use the separate bot-based
   `heino:export-history` tool instead.
 
+### ChatStats
+
+Local summary for the currently loaded channel or DM cache.
+
+- Use `/chat-stats`.
+- Counts loaded messages, unique authors, links, attachments, embeds, and
+  reactions.
+- Shows the busiest loaded hour and top loaded authors.
+- No network requests.
+
+### LocalSearch
+
+Local loaded-message search with export.
+
+- Use `/local-search query:your text`.
+- Use `/local-search query:your text format:markdown` for Markdown.
+- Optional `case-sensitive:true` matching.
+- Exports JSON or Markdown locally.
+- No network requests.
+
+### LinkCollector
+
+Local link index for loaded messages.
+
+- Use `/collect-links`.
+- Supports `format:json`, `format:csv`, and `format:markdown`.
+- Optional `unique:false` to keep duplicate URLs.
+- No network requests.
+
+### AttachmentIndex
+
+Local attachment metadata index for loaded messages.
+
+- Use `/attachment-index`.
+- Supports `format:json`, `format:csv`, and `format:markdown`.
+- Exports filename, URL, type, size, author, timestamp, and message id.
+- No network requests.
+
+### PrivacyScan
+
+Local privacy review for loaded messages.
+
+- Use `/privacy-scan`.
+- Detects email-like, phone-like, IPv4, Discord invite, and token-shaped
+  strings.
+- Samples are redacted in chat output.
+- Use `/privacy-scan export:true format:markdown` for a redacted local report.
+- No network requests.
+
 ## Advanced
 
 ### LastSeenTracker

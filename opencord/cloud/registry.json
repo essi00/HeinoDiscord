@@ -31,6 +31,41 @@
       "recommended": true,
       "privacy": "exports only messages already loaded in the local client",
       "network": []
+    },
+    {
+      "name": "ChatStats",
+      "source": "opencord/plugin-library/plugins/ChatStats",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "LocalSearch",
+      "source": "opencord/plugin-library/plugins/LocalSearch",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "LinkCollector",
+      "source": "opencord/plugin-library/plugins/LinkCollector",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "AttachmentIndex",
+      "source": "opencord/plugin-library/plugins/AttachmentIndex",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "PrivacyScan",
+      "source": "opencord/plugin-library/plugins/PrivacyScan",
+      "recommended": true,
+      "privacy": "local-only-redacted",
+      "network": []
     }
   ]
 }
