@@ -16,12 +16,19 @@ const aliases = [
     ["patcher.js.map", "HeinoDiscordPatcher.js.map"],
     ["patcher.js.LEGAL.txt", "HeinoDiscordPatcher.js.LEGAL.txt"],
     ["preload.js", "HeinoDiscordPreload.js"],
+    ["preload.js.map", "HeinoDiscordPreload.js.map"],
     ["renderer.js", "HeinoDiscordRenderer.js"],
+    ["renderer.js.map", "HeinoDiscordRenderer.js.map"],
     ["renderer.css", "HeinoDiscordRenderer.css"],
+    ["renderer.css.map", "HeinoDiscordRenderer.css.map"],
     ["vencordDesktopMain.js", "HeinoDiscordDesktopMain.js"],
+    ["vencordDesktopMain.js.map", "HeinoDiscordDesktopMain.js.map"],
     ["vencordDesktopPreload.js", "HeinoDiscordDesktopPreload.js"],
+    ["vencordDesktopPreload.js.map", "HeinoDiscordDesktopPreload.js.map"],
     ["vencordDesktopRenderer.js", "HeinoDiscordDesktopRenderer.js"],
-    ["vencordDesktopRenderer.css", "HeinoDiscordDesktopRenderer.css"]
+    ["vencordDesktopRenderer.js.map", "HeinoDiscordDesktopRenderer.js.map"],
+    ["vencordDesktopRenderer.css", "HeinoDiscordDesktopRenderer.css"],
+    ["vencordDesktopRenderer.css.map", "HeinoDiscordDesktopRenderer.css.map"]
 ];
 
 for (const [source, target] of aliases) {

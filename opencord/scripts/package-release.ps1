@@ -40,6 +40,7 @@ $items = @(
     "HeinoDiscord.exe",
     "HEINODISCORD.md",
     "HEINODISCORD_TUTORIAL.md",
+    "HEINODISCORD_PLUGIN_API.md",
     "GITHUB_PUBLISHING.md",
     "OPENCORD.md",
     "FORK_NOTICE.md",

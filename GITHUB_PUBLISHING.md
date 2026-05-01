@@ -41,8 +41,19 @@ That creates a public repository and pushes the local `main` branch.
 
 ```cmd
 cd "C:\Users\Joachim Csida\OpenCord"
-git remote add origin https://github.com/00essi00/HeinoDiscord.git
 git push -u origin main
+```
+
+The local `origin` remote is already set to:
+
+```text
+https://github.com/00essi00/HeinoDiscord.git
+```
+
+If you choose another repository name, update it with:
+
+```cmd
+git remote set-url origin https://github.com/00essi00/YOUR_REPO_NAME.git
 ```
 
 ## Publish A Release

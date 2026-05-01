@@ -365,8 +365,8 @@ export const commonOpts = {
     external: ["~plugins", "~git-hash", "~git-remote", "/assets/*"],
     inject: ["./scripts/build/inject/react.mjs"],
     jsx: "transform",
-    jsxFactory: "VencordCreateElement",
-    jsxFragment: "VencordFragment"
+    jsxFactory: "HeinoDiscordCreateElement",
+    jsxFragment: "HeinoDiscordFragment"
 };
 
 const escapedBuiltinModules = builtinModules

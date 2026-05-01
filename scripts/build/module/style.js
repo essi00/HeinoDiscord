@@ -16,7 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-(window.VencordStyles ??= new Map()).set(STYLE_NAME, {
+const heinoDiscordStyleMap = window.HeinoDiscordStyles ??= window.VencordStyles ??= new Map();
+window.VencordStyles ??= heinoDiscordStyleMap;
+
+heinoDiscordStyleMap.set(STYLE_NAME, {
     name: STYLE_NAME,
     source: STYLE_SOURCE,
     classNames: {},

@@ -31,7 +31,8 @@ export interface Style {
     dom: HTMLStyleElement | null;
 }
 
-export const styleMap = window.VencordStyles ??= new Map();
+export const styleMap = window.HeinoDiscordStyles ??= window.VencordStyles ??= new Map();
+window.VencordStyles ??= styleMap;
 
 export const vencordRootNode = document.createElement("vencord-root");
 /**
@@ -193,5 +194,4 @@ export const compileStyle = (style: Style) => {
             return className ? classNameToSelector(className) : match;
         });
 };
-
 

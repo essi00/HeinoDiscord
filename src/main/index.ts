@@ -26,10 +26,25 @@ import { RendererSettings } from "./settings";
 import { IS_VANILLA, THEMES_DIR } from "./utils/constants";
 import { installExt } from "./utils/extensions";
 
+const sourceMapAliases = new Map([
+    ["renderer.js.map", "renderer.js.map"],
+    ["HeinoDiscordRenderer.js.map", "renderer.js.map"],
+    ["vencordDesktopRenderer.js.map", "vencordDesktopRenderer.js.map"],
+    ["HeinoDiscordDesktopRenderer.js.map", "vencordDesktopRenderer.js.map"],
+    ["preload.js.map", "preload.js.map"],
+    ["HeinoDiscordPreload.js.map", "preload.js.map"],
+    ["vencordDesktopPreload.js.map", "vencordDesktopPreload.js.map"],
+    ["HeinoDiscordDesktopPreload.js.map", "vencordDesktopPreload.js.map"],
+    ["patcher.js.map", "patcher.js.map"],
+    ["HeinoDiscordPatcher.js.map", "patcher.js.map"],
+    ["vencordDesktopMain.js.map", "vencordDesktopMain.js.map"],
+    ["HeinoDiscordDesktopMain.js.map", "vencordDesktopMain.js.map"]
+]);
+
 if (IS_VESKTOP || !IS_VANILLA) {
     app.whenReady().then(() => {
-        protocol.handle("vencord", ({ url: unsafeUrl }) => {
-            let url = decodeURI(unsafeUrl).slice("vencord://".length).replace(/\?v=\d+$/, "");
+        const handleResourceProtocol = ({ url: unsafeUrl }: { url: string; }, scheme: "heinodiscord" | "vencord") => {
+            let url = decodeURI(unsafeUrl).slice(`${scheme}://`.length).replace(/\?v=\d+$/, "");
 
             if (url.endsWith("/")) url = url.slice(0, -1);
 
@@ -49,26 +64,24 @@ if (IS_VESKTOP || !IS_VANILLA) {
             // Source Maps! Maybe there's a better way but since the renderer is executed
             // from a string I don't think any other form of sourcemaps would work
 
-            switch (url) {
-                case "renderer.js.map":
-                case "vencordDesktopRenderer.js.map":
-                case "preload.js.map":
-                case "vencordDesktopPreload.js.map":
-                case "patcher.js.map":
-                case "vencordDesktopMain.js.map":
-                    return net.fetch(pathToFileURL(join(__dirname, url)).toString());
-                default:
-                    return new Response(null, {
-                        status: 404
-                    });
+            const sourceMapFile = sourceMapAliases.get(url);
+            if (sourceMapFile) {
+                return net.fetch(pathToFileURL(join(__dirname, sourceMapFile)).toString());
             }
-        });
+
+            return new Response(null, {
+                status: 404
+            });
+        };
+
+        protocol.handle("heinodiscord", request => handleResourceProtocol(request, "heinodiscord"));
+        protocol.handle("vencord", request => handleResourceProtocol(request, "vencord"));
 
         try {
             if (RendererSettings.store.enableReactDevtools)
                 installExt("fmkadmapgofadopljbjfkapdkoienihi")
-                    .then(() => console.info("[Vencord] Installed React Developer Tools"))
-                    .catch(err => console.error("[Vencord] Failed to install React Developer Tools", err));
+                    .then(() => console.info("[HeinoDiscord] Installed React Developer Tools"))
+                    .catch(err => console.error("[HeinoDiscord] Failed to install React Developer Tools", err));
         } catch { }
 
 

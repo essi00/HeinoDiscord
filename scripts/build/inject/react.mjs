@@ -16,6 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export const VencordFragment = /* #__PURE__*/ Symbol.for("react.fragment");
+export const HeinoDiscordFragment = /* #__PURE__*/ Symbol.for("react.fragment");
+export const VencordFragment = HeinoDiscordFragment;
+
+export let HeinoDiscordCreateElement =
+    (...args) => (HeinoDiscordCreateElement = HeinoDiscord.Webpack.Common.React.createElement)(...args);
 export let VencordCreateElement =
-    (...args) => (VencordCreateElement = Vencord.Webpack.Common.React.createElement)(...args);
+    (...args) => (VencordCreateElement = HeinoDiscordCreateElement)(...args);

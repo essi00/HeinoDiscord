@@ -5,12 +5,10 @@ This is the practical user guide for HeinoDiscord.
 ## What HeinoDiscord Is
 
 HeinoDiscord is a full open-source Discord desktop mod distribution. It uses the
-OpenCord engine and keeps the Vencord-compatible plugin API internally so that
-existing Vencord plugins still work.
+OpenCord engine and exposes `globalThis.HeinoDiscord` as the primary runtime API.
 
-That means some internal names can still say `Vencord`. This is intentional
-compatibility, not the product identity. User-facing installer, settings data,
-release package, and patch entrypoint are HeinoDiscord.
+Existing Vencord plugins still work through a legacy `globalThis.Vencord` bridge
+that points to the same object. New plugins should use `HeinoDiscord`.
 
 ## Install For Yourself
 
@@ -101,10 +99,11 @@ release/HeinoDiscord-release.zip
 
 Upload `HeinoDiscord-release.zip` to GitHub Releases.
 
-## Why The Compatibility API Is Still Called Vencord
+## Why There Is Still A Vencord Bridge
 
-The runtime keeps `globalThis.Vencord` because many existing plugins import or
-access that API. Removing it would break the plugin ecosystem.
+The runtime now exposes `globalThis.HeinoDiscord` first. It also keeps
+`globalThis.Vencord` as a compatibility bridge because many existing plugins
+import or access that API. Removing it would break the existing plugin ecosystem.
 
 HeinoDiscord adds:
 
@@ -113,7 +112,9 @@ HeinoDiscord adds:
 - HeinoDiscord release package,
 - HeinoDiscord patch entrypoint,
 - HeinoDiscord plugin registry,
-- HeinoDiscord recommended profile.
+- HeinoDiscord recommended profile,
+- HeinoDiscord source maps and resource protocol.
 
-The compatibility layer remains available so users can still run the existing
-plugin ecosystem.
+Use `HeinoDiscord.Api.*`, `HeinoDiscord.Plugins.*`, and
+`HeinoDiscord.Webpack.*` for new code. The compatibility layer remains available
+so users can still run the existing plugin ecosystem.

@@ -24,12 +24,12 @@ async function runReporter() {
             find: '"Could not find app-mount"',
             replacement: {
                 match: /"Could not find app-mount"/,
-                replace: "(Vencord.Webpack._initReporter(),$&)"
+                replace: "(HeinoDiscord.Webpack._initReporter(),$&)"
             }
         }, "Vencord Reporter");
 
         // @ts-expect-error
-        Vencord.Webpack._initReporter = function () {
+        HeinoDiscord.Webpack._initReporter = function () {
             // initReporter is called in the patched entry point of Discord
             // setImmediate to only start searching for lazy chunks after Discord initialized the app
             setTimeout(() => loadLazyChunks().then(loadLazyChunksResolve), 0);

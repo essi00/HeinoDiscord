@@ -46,8 +46,11 @@ declare global {
     export var BUILD_TIMESTAMP: number;
 
     export var VencordNative: typeof import("./VencordNative").default;
+    export var HeinoDiscordNative: typeof import("./VencordNative").default;
     export var Vencord: typeof import("./Vencord");
+    export var HeinoDiscord: typeof import("./Vencord");
     export var VencordStyles: Map<string, Style>;
+    export var HeinoDiscordStyles: Map<string, Style>;
     export var appSettings: {
         set(setting: string, v: any): void;
     };

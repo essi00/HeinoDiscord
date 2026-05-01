@@ -30,7 +30,7 @@ export default definePlugin({
             find: "♫ (つ｡◕‿‿◕｡)つ ♪",
             replacement: {
                 match: /(?=let{navId:)(?<=function \i\((\i)\).+?)/,
-                replace: "$1=Vencord.Api.ContextMenu._usePatchContextMenu($1);"
+                replace: "$1=HeinoDiscord.Api.ContextMenu._usePatchContextMenu($1);"
             }
         },
         {

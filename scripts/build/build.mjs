@@ -56,7 +56,11 @@ const nodeCommonOpts = {
     external: ["electron", "original-fs", "~pluginNatives", ...commonOpts.external]
 };
 
-const sourceMapFooter = s => watch ? "" : `//# sourceMappingURL=vencord://${s}.js.map`;
+const legacyApiFooter = `
+;Object.defineProperty(globalThis,"Vencord",{configurable:true,get(){return globalThis.HeinoDiscord;}});
+;Object.defineProperty(globalThis,"HeinoDiscordLegacy",{configurable:true,get(){return globalThis.HeinoDiscord;}});
+`;
+const sourceMapFooter = s => watch ? "" : `//# sourceMappingURL=heinodiscord://${s}.js.map`;
 const sourcemap = watch ? "inline" : "external";
 
 /**
@@ -122,7 +126,7 @@ const buildConfigs = ([
         ...nodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
         outfile: "dist/patcher.js",
-        footer: { js: "//# sourceURL=file:///VencordPatcher\n" + sourceMapFooter("patcher") },
+        footer: { js: "//# sourceURL=file:///HeinoDiscordPatcher\n" + sourceMapFooter("patcher") },
         sourcemap,
         plugins: [
             // @ts-ignore this is never undefined
@@ -141,8 +145,8 @@ const buildConfigs = ([
         outfile: "dist/renderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: { js: "//# sourceURL=file:///VencordRenderer\n" + sourceMapFooter("renderer") },
-        globalName: "Vencord",
+        footer: { js: legacyApiFooter + "\n//# sourceURL=file:///HeinoDiscordRenderer\n" + sourceMapFooter("renderer") },
+        globalName: "HeinoDiscord",
         sourcemap,
         plugins: [
             globPlugins("discordDesktop"),
@@ -158,7 +162,7 @@ const buildConfigs = ([
         ...nodeCommonOpts,
         entryPoints: ["src/preload.ts"],
         outfile: "dist/preload.js",
-        footer: { js: "//# sourceURL=file:///VencordPreload\n" + sourceMapFooter("preload") },
+        footer: { js: "//# sourceURL=file:///HeinoDiscordPreload\n" + sourceMapFooter("preload") },
         sourcemap,
         define: {
             ...defines,
@@ -167,12 +171,12 @@ const buildConfigs = ([
         }
     },
 
-    // Vencord Desktop main & renderer & preload
+    // HeinoDiscord Desktop main & renderer & preload
     {
         ...nodeCommonOpts,
         entryPoints: ["src/main/index.ts"],
         outfile: "dist/vencordDesktopMain.js",
-        footer: { js: "//# sourceURL=file:///VencordDesktopMain\n" + sourceMapFooter("vencordDesktopMain") },
+        footer: { js: "//# sourceURL=file:///HeinoDiscordDesktopMain\n" + sourceMapFooter("vencordDesktopMain") },
         sourcemap,
         plugins: [
             ...nodeCommonOpts.plugins,
@@ -190,8 +194,8 @@ const buildConfigs = ([
         outfile: "dist/vencordDesktopRenderer.js",
         format: "iife",
         target: ["esnext"],
-        footer: { js: "//# sourceURL=file:///VencordDesktopRenderer\n" + sourceMapFooter("vencordDesktopRenderer") },
-        globalName: "Vencord",
+        footer: { js: legacyApiFooter + "\n//# sourceURL=file:///HeinoDiscordDesktopRenderer\n" + sourceMapFooter("vencordDesktopRenderer") },
+        globalName: "HeinoDiscord",
         sourcemap,
         plugins: [
             globPlugins("vesktop"),
@@ -207,7 +211,7 @@ const buildConfigs = ([
         ...nodeCommonOpts,
         entryPoints: ["src/preload.ts"],
         outfile: "dist/vencordDesktopPreload.js",
-        footer: { js: "//# sourceURL=file:///VencordPreload\n" + sourceMapFooter("vencordDesktopPreload") },
+        footer: { js: "//# sourceURL=file:///HeinoDiscordPreload\n" + sourceMapFooter("vencordDesktopPreload") },
         sourcemap,
         define: {
             ...defines,

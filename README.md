@@ -14,6 +14,7 @@ Start here:
 - [HeinoDiscord product guide](./HEINODISCORD.md)
 - [HeinoDiscord tutorial](./HEINODISCORD_TUTORIAL.md)
 - [GitHub publishing](./GITHUB_PUBLISHING.md)
+- [HeinoDiscord plugin API](./HEINODISCORD_PLUGIN_API.md)
 - [OpenCord overview](./OPENCORD.md)
 - [Fork notice](./FORK_NOTICE.md)
 - [Plugin development](./opencord/docs/PLUGIN_DEVELOPMENT.md)

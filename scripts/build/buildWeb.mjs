@@ -33,7 +33,7 @@ const commonOptions = {
     ...commonOpts,
     entryPoints: ["browser/Vencord.ts"],
     format: "iife",
-    globalName: "Vencord",
+    globalName: "HeinoDiscord",
     external: ["~plugins", "~git-hash", "/assets/*"],
     target: ["esnext"],
     plugins: [
@@ -84,7 +84,7 @@ const buildConfigs = [
     {
         ...commonOptions,
         outfile: "dist/browser.js",
-        footer: { js: "//# sourceURL=file:///VencordWeb" }
+        footer: { js: "Object.defineProperty(globalThis,'Vencord',{configurable:true,get:()=>globalThis.HeinoDiscord});\n//# sourceURL=file:///HeinoDiscordWeb" }
     },
     {
         ...commonOptions,
@@ -93,7 +93,7 @@ const buildConfigs = [
             ...commonOptions.define,
             IS_EXTENSION: "true"
         },
-        footer: { js: "//# sourceURL=file:///VencordWeb" }
+        footer: { js: "Object.defineProperty(globalThis,'Vencord',{configurable:true,get:()=>globalThis.HeinoDiscord});\n//# sourceURL=file:///HeinoDiscordWeb" }
     },
     {
         ...commonOptions,
@@ -108,8 +108,8 @@ const buildConfigs = [
             js: readFileSync("browser/userscript.meta.js", "utf-8").replace("%version%", `${VERSION}.${new Date().getTime()}`)
         },
         footer: {
-            // UserScripts get wrapped in an iife, so define Vencord prop on window that returns our local
-            js: "Object.defineProperty(unsafeWindow,'Vencord',{get:()=>Vencord});"
+            // UserScripts get wrapped in an iife, so expose HeinoDiscord and a Vencord legacy bridge.
+            js: "Object.defineProperty(unsafeWindow,'HeinoDiscord',{configurable:true,get:()=>HeinoDiscord});Object.defineProperty(unsafeWindow,'Vencord',{configurable:true,get:()=>HeinoDiscord});"
         }
     }
 ];

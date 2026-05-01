@@ -1,6 +1,8 @@
 # OpenCord Plugin Development
 
-OpenCord plugins are Vencord-compatible userplugins.
+OpenCord plugins are HeinoDiscord plugins with Vencord-compatible structure.
+Use `HeinoDiscord.*` for new runtime API access. The `Vencord.*` global remains
+as a legacy bridge so existing plugins can still run.
 
 ## Create A Plugin
 
@@ -45,6 +47,17 @@ export default definePlugin({
     }
 });
 ```
+
+## Runtime API
+
+```ts
+HeinoDiscord.Api
+HeinoDiscord.Plugins
+HeinoDiscord.Webpack
+HeinoDiscord.WebpackPatcher
+```
+
+For legacy imports or snippets, `Vencord` points to the same runtime object.
 
 ## Rules
 

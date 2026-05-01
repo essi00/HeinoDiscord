@@ -3,6 +3,8 @@
 HeinoDiscord is the user-facing distribution built on the OpenCord engine.
 It ships as a source-available package with a Windows installer named
 `HeinoDiscord.exe`.
+The runtime exposes `globalThis.HeinoDiscord` as the primary API and keeps
+`globalThis.Vencord` only as a compatibility bridge for existing plugins.
 
 ## What The Installer Does
 
@@ -77,3 +79,11 @@ opencord/cloud/registry.json
 
 You can host that registry on GitHub Pages or raw GitHub for a public plugin
 catalog. Users still build from source, which keeps the system inspectable.
+
+New plugins should use:
+
+```text
+HeinoDiscord.Api
+HeinoDiscord.Plugins
+HeinoDiscord.Webpack
+```
