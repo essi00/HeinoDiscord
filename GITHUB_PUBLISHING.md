@@ -8,10 +8,10 @@ Current local repository:
 C:\Users\Joachim Csida\OpenCord
 ```
 
-Authenticated GitHub user seen by Codex:
+GitHub repository owner:
 
 ```text
-00essi00
+essi00
 ```
 
 ## Option A: GitHub CLI
@@ -27,7 +27,7 @@ Then run:
 ```cmd
 cd "C:\Users\Joachim Csida\OpenCord"
 gh auth login
-pnpm heino:publish-github -- -Owner 00essi00 -Repo HeinoDiscord
+pnpm heino:publish-github -- -Owner essi00 -Repo HeinoDiscord
 ```
 
 That creates a public repository and pushes the local `main` branch.
@@ -47,13 +47,13 @@ git push -u origin main
 The local `origin` remote is already set to:
 
 ```text
-https://github.com/00essi00/HeinoDiscord.git
+https://github.com/essi00/HeinoDiscord.git
 ```
 
 If you choose another repository name, update it with:
 
 ```cmd
-git remote set-url origin https://github.com/00essi00/YOUR_REPO_NAME.git
+git remote set-url origin https://github.com/essi00/YOUR_REPO_NAME.git
 ```
 
 ## Publish A Release

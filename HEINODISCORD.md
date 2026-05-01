@@ -3,8 +3,9 @@
 HeinoDiscord is the user-facing distribution built on the OpenCord engine.
 It ships as a source-available package with a Windows installer named
 `HeinoDiscord.exe`.
-The runtime exposes `globalThis.HeinoDiscord` as the primary API and keeps
-`globalThis.Vencord` only as a compatibility bridge for existing plugins.
+It does not present itself as a Vencord runtime. The primary API is
+`globalThis.HeinoDiscord`; `globalThis.Vencord` exists only as a compatibility
+adapter for current plugins that still reference that global.
 
 ## What The Installer Does
 
@@ -86,4 +87,18 @@ New plugins should use:
 HeinoDiscord.Api
 HeinoDiscord.Plugins
 HeinoDiscord.Webpack
+```
+
+## LocalChatExporter
+
+`LocalChatExporter` is token-free. It reads the messages Discord has already
+loaded into the current channel cache and saves them locally as JSON or Markdown.
+It cannot fetch hidden history or bypass permissions; scroll/load more messages
+first if you want a larger export.
+
+Commands:
+
+```text
+/export-local-chat
+/export-local-chat format:markdown
 ```

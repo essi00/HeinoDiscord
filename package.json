@@ -2,14 +2,14 @@
     "name": "heinodiscord",
     "private": "true",
     "version": "1.14.11",
-    "description": "HeinoDiscord, an open-source Discord client mod distribution with Vencord-compatible plugins",
-    "homepage": "https://github.com/00essi00/HeinoDiscord",
+    "description": "HeinoDiscord, an independent open-source Discord client mod distribution with a plugin compatibility adapter",
+    "homepage": "https://github.com/essi00/HeinoDiscord",
     "bugs": {
-        "url": "https://github.com/00essi00/HeinoDiscord/issues"
+        "url": "https://github.com/essi00/HeinoDiscord/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/00essi00/HeinoDiscord.git"
+        "url": "git+https://github.com/essi00/HeinoDiscord.git"
     },
     "license": "GPL-3.0-or-later",
     "author": "OpenCord contributors, based on Vendicated/Vencord contributors",

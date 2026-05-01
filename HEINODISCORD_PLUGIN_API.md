@@ -6,7 +6,7 @@ HeinoDiscord exposes its runtime as:
 globalThis.HeinoDiscord
 ```
 
-The old Vencord global remains as a legacy bridge:
+The old Vencord global remains as a legacy compatibility adapter:
 
 ```js
 globalThis.Vencord === globalThis.HeinoDiscord
@@ -44,8 +44,12 @@ Open Discord DevTools and run:
 })
 ```
 
-## Why Keep The Bridge?
+## Compatibility Adapter
 
 Thousands of existing plugins and snippets reference `Vencord.*`. The bridge
 lets those plugins continue to work while new public documentation and new
 plugins move to `HeinoDiscord.*`.
+
+This does not mean new HeinoDiscord code should be written against Vencord as a
+product or runtime. Treat `Vencord.*` as an import/global compatibility alias for
+current plugins only.

@@ -8,7 +8,7 @@ Local template expansion for support and repeated messages.
 
 - Type `;;hello` to expand a template before sending.
 - Use `/qt` to list templates or `/qt name` to preview one locally.
-- Templates are stored in Vencord plugin settings as JSON.
+- Templates are stored in HeinoDiscord plugin settings as JSON.
 - No network requests.
 
 ### LinkSafety
@@ -37,6 +37,9 @@ Token-free local channel export.
 - Use `/export-local-chat format:markdown` for Markdown.
 - Exports the messages currently cached/loaded by the running Discord client.
 - Does not ask for, read, store, or display a Discord token.
+- Does not call Discord's history API or fetch messages that are not already
+  loaded in the client.
+- The exported file is created locally with a browser download.
 - Scroll/load more history first if you need more messages in the export.
 
 ## Advanced

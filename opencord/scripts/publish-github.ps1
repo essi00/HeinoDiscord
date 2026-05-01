@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Owner = "00essi00",
+    [string]$Owner = "essi00",
     [string]$Repo = "HeinoDiscord",
     [switch]$Private
 )

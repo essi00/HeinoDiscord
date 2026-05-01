@@ -11,5 +11,5 @@ This folder contains OpenCord-specific tooling:
 - `scripts/register-auto-repatch.ps1`: installs scheduled auto-repair tasks.
 - `docs/PLUGIN_DEVELOPMENT.md`: plugin author guide.
 
-The core runtime intentionally remains Vencord-compatible so existing plugins
-can run unchanged.
+The core runtime is HeinoDiscord/OpenCord. A compatibility adapter remains so
+current Vencord-format plugins can run unchanged.

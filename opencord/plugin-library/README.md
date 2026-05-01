@@ -1,18 +1,18 @@
-# Open Vencord Plugin Library
+# HeinoDiscord Open Plugin Library
 
-Source-based Vencord userplugin library with an opt-in installer. It copies only
-the plugins you select into `Vencord/src/userplugins`, then optionally rebuilds
-and repatches Discord.
+Source-based HeinoDiscord plugin library with an opt-in installer. It copies
+only the plugins you select into `src/userplugins`, then optionally rebuilds and
+repatches Discord.
 
 This avoids the usual problem where every local file in `src/userplugins` gets
-compiled into your Vencord build.
+compiled into your client build.
 
 ## Quick Install
 
 From PowerShell:
 
 ```powershell
-cd "$env:USERPROFILE\VencordPluginLibrary"
+cd "$env:USERPROFILE\OpenCord"
 .\scripts\install.ps1 -Recommended -Build -Patch
 ```
 
@@ -55,7 +55,8 @@ Advanced plugins are not installed by `-Recommended`. They require either an
 explicit plugin name or `-IncludeAdvanced`.
 
 `LocalChatExporter` intentionally has no token field. It exports only messages
-already loaded in your running Discord client.
+already loaded in your running Discord client. It reads the local message cache,
+then creates a browser download as JSON or Markdown.
 
 ## Publishing
 
@@ -64,7 +65,7 @@ This folder is ready to become a public GitHub repo:
 ```powershell
 git init
 git add .
-git commit -m "Initial open Vencord plugin library"
+git commit -m "Initial HeinoDiscord plugin library"
 ```
 
 After pushing, users can clone the repo and run the installer.

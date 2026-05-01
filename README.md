@@ -4,10 +4,29 @@ HeinoDiscord is the user-facing product package for this repository. It includes
 a Windows installer named `HeinoDiscord.exe`, a recommended plugin profile, and
 a static open plugin registry.
 
-OpenCord is the independent GPL Discord client mod engine built on the
-Vencord-compatible plugin architecture. It keeps compatibility with existing
-Vencord plugins while adding OpenCord tooling for a curated plugin library and
-user-created plugins.
+OpenCord is the independent GPL Discord client mod engine behind HeinoDiscord.
+It has its own runtime identity, installer, data folder, patch entrypoint,
+resource protocol, plugin registry, and public `HeinoDiscord.*` API.
+
+Current Vencord plugins can still run through a compatibility adapter for the
+existing plugin format and legacy `Vencord.*` global. That adapter is there so
+users do not lose the current plugin ecosystem; new HeinoDiscord code should use
+`HeinoDiscord.*`.
+
+## LocalChatExporter
+
+`LocalChatExporter` exports messages already loaded in your running Discord
+client. It reads Discord's local in-memory message cache for the current channel
+and downloads a JSON or Markdown file in your browser context.
+
+It does not ask for, read, store, or display your Discord token. It does not
+crawl Discord's API or bypass channel permissions. If you need more history in
+the export, scroll/load more of the channel first and run:
+
+```text
+/export-local-chat
+/export-local-chat format:markdown
+```
 
 Start here:
 

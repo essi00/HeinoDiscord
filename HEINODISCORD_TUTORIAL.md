@@ -5,10 +5,12 @@ This is the practical user guide for HeinoDiscord.
 ## What HeinoDiscord Is
 
 HeinoDiscord is a full open-source Discord desktop mod distribution. It uses the
-OpenCord engine and exposes `globalThis.HeinoDiscord` as the primary runtime API.
+independent OpenCord engine and exposes `globalThis.HeinoDiscord` as the primary
+runtime API.
 
-Existing Vencord plugins still work through a legacy `globalThis.Vencord` bridge
-that points to the same object. New plugins should use `HeinoDiscord`.
+Existing Vencord plugins still work through a compatibility adapter for the
+current plugin format and the legacy `globalThis.Vencord` bridge. New plugins
+should use `HeinoDiscord`.
 
 ## Install For Yourself
 
@@ -57,6 +59,23 @@ Recommended built-in plugins are enabled through:
 opencord/profiles/recommended-settings.json
 ```
 
+## How LocalChatExporter Works
+
+`LocalChatExporter` is a local cache exporter, not a token exporter.
+
+- It registers the slash command `/export-local-chat`.
+- It reads the current channel from Discord's already-loaded `MessageStore`.
+- It exports only messages currently cached in the running client.
+- It writes a local browser download as JSON by default.
+- It supports Markdown with `/export-local-chat format:markdown`.
+- It includes message ids, channel/guild info, author ids/names, timestamps,
+  content, attachment links, embed summaries, and reply references.
+- It does not ask for or use a Discord token.
+- It does not fetch extra history from Discord's API.
+
+If the export has too few messages, scroll upward in the channel to load more
+history first, then run the command again.
+
 ## Enable Optional LastSeenTracker
 
 ```cmd
@@ -101,7 +120,7 @@ Upload `HeinoDiscord-release.zip` to GitHub Releases.
 
 ## Why There Is Still A Vencord Bridge
 
-The runtime now exposes `globalThis.HeinoDiscord` first. It also keeps
+The runtime exposes `globalThis.HeinoDiscord` first. It also keeps
 `globalThis.Vencord` as a compatibility bridge because many existing plugins
 import or access that API. Removing it would break the existing plugin ecosystem.
 
