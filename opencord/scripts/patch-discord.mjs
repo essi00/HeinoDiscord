@@ -10,7 +10,10 @@ import { fileURLToPath } from "url";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const OPENCORD_ROOT = resolve(SCRIPT_DIR, "..", "..");
-const PATCHER_PATH = join(OPENCORD_ROOT, "dist", "patcher.js");
+const HEINO_PATCHER_PATH = join(OPENCORD_ROOT, "dist", "HeinoDiscordPatcher.js");
+const PATCHER_PATH = existsSync(HEINO_PATCHER_PATH)
+    ? HEINO_PATCHER_PATH
+    : join(OPENCORD_ROOT, "dist", "patcher.js");
 const LOCAL_APP_DATA = process.env.LOCALAPPDATA || join(homedir(), "AppData", "Local");
 
 const DEFAULT_INSTALLS = [

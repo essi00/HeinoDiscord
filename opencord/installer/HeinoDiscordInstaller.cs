@@ -30,6 +30,24 @@ internal static class HeinoDiscordInstaller
         }
     }
 
+    private sealed class InstallPatchInfo
+    {
+        public DiscordInstall Install;
+        public DirectoryInfo LatestApp;
+        public string AppAsar;
+        public string OriginalAsar;
+        public bool IsPatched;
+
+        public InstallPatchInfo(DiscordInstall install, DirectoryInfo latestApp, string appAsar, string originalAsar, bool isPatched)
+        {
+            Install = install;
+            LatestApp = latestApp;
+            AppAsar = appAsar;
+            OriginalAsar = originalAsar;
+            IsPatched = isPatched;
+        }
+    }
+
     private static int Main(string[] args)
     {
         Console.Title = ProductName + " Installer";
@@ -140,6 +158,7 @@ internal static class HeinoDiscordInstaller
         Run(root, pluginCommand);
         Run(root, "pnpm heino:profile -- recommended");
         Run(root, "pnpm run build:discord");
+        Run(root, "pnpm heino:finalize-dist");
     }
 
     private static bool CommandExists(string root, string command)
@@ -201,20 +220,29 @@ internal static class HeinoDiscordInstaller
 
     private static void PatchAllDiscordInstalls(string root)
     {
-        StopDiscord();
-
-        string patcherPath = System.IO.Path.Combine(root, "dist", "patcher.js");
+        string patcherPath = GetPatcherPath(root);
         if (!File.Exists(patcherPath))
             throw new FileNotFoundException("Missing built patcher. Build failed or dist is incomplete.", patcherPath);
 
-        bool patchedAny = false;
-        foreach (DiscordInstall install in GetDiscordInstalls())
+        List<InstallPatchInfo> installs = GetDiscordInstalls()
+            .Select(i => GetInstallPatchInfo(i, patcherPath))
+            .Where(i => i != null)
+            .ToList();
+
+        if (installs.Count == 0)
+            throw new InvalidOperationException("No Discord install found under LocalAppData.");
+
+        List<InstallPatchInfo> needsPatch = installs.Where(i => !i.IsPatched).ToList();
+        if (needsPatch.Count == 0)
         {
-            patchedAny = PatchInstall(install, patcherPath) || patchedAny;
+            foreach (InstallPatchInfo install in installs)
+                Console.WriteLine("[patch] " + install.Install.Label + " already points at HeinoDiscord: " + install.LatestApp.Name);
+            return;
         }
 
-        if (!patchedAny)
-            throw new InvalidOperationException("No Discord install found under LocalAppData.");
+        StopDiscord();
+        foreach (InstallPatchInfo install in needsPatch)
+            PatchInstall(install, patcherPath);
     }
 
     private static void StopDiscord()
@@ -235,13 +263,22 @@ internal static class HeinoDiscordInstaller
         }
     }
 
-    private static bool PatchInstall(DiscordInstall install, string patcherPath)
+    private static string GetPatcherPath(string root)
+    {
+        string heinoPatcher = System.IO.Path.Combine(root, "dist", "HeinoDiscordPatcher.js");
+        if (File.Exists(heinoPatcher))
+            return heinoPatcher;
+
+        return System.IO.Path.Combine(root, "dist", "patcher.js");
+    }
+
+    private static InstallPatchInfo GetInstallPatchInfo(DiscordInstall install, string patcherPath)
     {
         DirectoryInfo latest = GetLatestDiscordApp(install.Path);
         if (latest == null)
         {
             Console.WriteLine("[patch] Skipping " + install.Label + ": no app-* folder.");
-            return false;
+            return null;
         }
 
         string resources = System.IO.Path.Combine(latest.FullName, "resources");
@@ -253,21 +290,23 @@ internal static class HeinoDiscordInstaller
 
         string text = Encoding.UTF8.GetString(File.ReadAllBytes(appAsar));
         string escapedPath = patcherPath.Replace("\\", "\\\\");
-        if (text.Contains(patcherPath) || text.Contains(escapedPath))
+        bool isPatched = text.Contains(patcherPath) || text.Contains(escapedPath);
+
+        return new InstallPatchInfo(install, latest, appAsar, originalAsar, isPatched);
+    }
+
+    private static void PatchInstall(InstallPatchInfo info, string patcherPath)
+    {
+        string text = Encoding.UTF8.GetString(File.ReadAllBytes(info.AppAsar));
+
+        if (!File.Exists(info.OriginalAsar) && !text.Contains("dist\\\\patcher.js") && !text.Contains("dist\\\\HeinoDiscordPatcher.js"))
         {
-            Console.WriteLine("[patch] " + install.Label + " already points at HeinoDiscord: " + latest.Name);
-            return true;
+            File.Copy(info.AppAsar, info.OriginalAsar);
+            Console.WriteLine("[patch] Backed up original app.asar for " + info.Install.Label + ".");
         }
 
-        if (!File.Exists(originalAsar) && !text.Contains("dist\\\\patcher.js"))
-        {
-            File.Copy(appAsar, originalAsar);
-            Console.WriteLine("[patch] Backed up original app.asar for " + install.Label + ".");
-        }
-
-        File.WriteAllBytes(appAsar, CreateDiscordAsar(patcherPath));
-        Console.WriteLine("[patch] Patched " + install.Label + ": " + appAsar);
-        return true;
+        File.WriteAllBytes(info.AppAsar, CreateDiscordAsar(patcherPath));
+        Console.WriteLine("[patch] Patched " + info.Install.Label + ": " + info.AppAsar);
     }
 
     private static DirectoryInfo GetLatestDiscordApp(string installPath)

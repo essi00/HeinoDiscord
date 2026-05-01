@@ -21,6 +21,9 @@ if (-not $SkipBuild) {
 
         pnpm run build:discord
         if ($LASTEXITCODE -ne 0) { throw "Build failed with exit code $LASTEXITCODE" }
+
+        pnpm heino:finalize-dist
+        if ($LASTEXITCODE -ne 0) { throw "Dist finalization failed with exit code $LASTEXITCODE" }
     } finally {
         Pop-Location
     }
@@ -36,6 +39,8 @@ New-Item -ItemType Directory -Force -Path $PackageRoot | Out-Null
 $items = @(
     "HeinoDiscord.exe",
     "HEINODISCORD.md",
+    "HEINODISCORD_TUTORIAL.md",
+    "GITHUB_PUBLISHING.md",
     "OPENCORD.md",
     "FORK_NOTICE.md",
     "LICENSE",

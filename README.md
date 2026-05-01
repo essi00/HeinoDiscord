@@ -12,6 +12,8 @@ user-created plugins.
 Start here:
 
 - [HeinoDiscord product guide](./HEINODISCORD.md)
+- [HeinoDiscord tutorial](./HEINODISCORD_TUTORIAL.md)
+- [GitHub publishing](./GITHUB_PUBLISHING.md)
 - [OpenCord overview](./OPENCORD.md)
 - [Fork notice](./FORK_NOTICE.md)
 - [Plugin development](./opencord/docs/PLUGIN_DEVELOPMENT.md)

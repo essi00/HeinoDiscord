@@ -21,6 +21,12 @@ Run:
 HeinoDiscord.exe
 ```
 
+Full tutorial:
+
+```text
+HEINODISCORD_TUTORIAL.md
+```
+
 Repair only:
 
 ```cmd

@@ -21,6 +21,11 @@ try {
         throw "pnpm run build:discord failed with exit code $LASTEXITCODE"
     }
 
+    node "opencord\scripts\finalize-dist.mjs"
+    if ($LASTEXITCODE -ne 0) {
+        throw "HeinoDiscord dist finalization failed with exit code $LASTEXITCODE"
+    }
+
     node "opencord\scripts\patch-discord.mjs" --all
     if ($LASTEXITCODE -ne 0) {
         throw "OpenCord Discord patch failed with exit code $LASTEXITCODE"
