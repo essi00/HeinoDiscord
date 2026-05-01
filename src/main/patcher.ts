@@ -23,7 +23,7 @@ import { dirname, join } from "path";
 import { RendererSettings } from "./settings";
 import { IS_VANILLA } from "./utils/constants";
 
-console.log("[Vencord] Starting up...");
+console.log("[HeinoDiscord] Starting up...");
 
 // Our injector file at app/index.js
 const injectorPath = require.main!.filename;
@@ -130,7 +130,8 @@ if (!IS_VANILLA) {
         s.set("DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING", true);
     });
 
-    process.env.DATA_DIR = join(app.getPath("userData"), "..", "Vencord");
+    process.env.DATA_DIR = process.env.HEINODISCORD_USER_DATA_DIR ?? join(app.getPath("userData"), "..", "HeinoDiscord");
+    process.env.VENCORD_USER_DATA_DIR ??= process.env.DATA_DIR;
 
     // Monkey patch commandLine to:
     // - disable WidgetLayering: Fix DevTools context menus https://github.com/electron/electron/issues/38790
@@ -155,8 +156,8 @@ if (!IS_VANILLA) {
     app.commandLine.appendSwitch("disable-background-timer-throttling");
     app.commandLine.appendSwitch("disable-backgrounding-occluded-windows");
 } else {
-    console.log("[Vencord] Running in vanilla mode. Not loading Vencord");
+    console.log("[HeinoDiscord] Running in vanilla mode. Not loading HeinoDiscord");
 }
 
-console.log("[Vencord] Loading original Discord app.asar");
+console.log("[HeinoDiscord] Loading original Discord app.asar");
 require(require.main!.filename);

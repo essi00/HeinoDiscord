@@ -84,12 +84,15 @@ function toExportedMessage(message: Message, guildId?: string): ExportedMessage 
             size: a.size,
             contentType: a.content_type
         })),
-        embeds: (message.embeds ?? []).map(e => ({
-            title: e.title,
-            description: e.rawDescription ?? e.description,
-            url: e.url,
-            type: e.type
-        })),
+        embeds: (message.embeds ?? []).map(e => {
+            const embed = e as any;
+            return {
+                title: embed.title,
+                description: embed.rawDescription ?? embed.description,
+                url: embed.url,
+                type: embed.type
+            };
+        }),
         replyTo: message.messageReference?.message_id
     };
 }
@@ -191,6 +194,7 @@ export default definePlugin({
     description: "Token-free local export of the currently cached messages in this channel as JSON or Markdown.",
     authors: [{ name: "Open Plugin Library", id: 0n }],
     tags: ["Utility", "Chat"],
+    enabledByDefault: true,
     dependencies: ["CommandsAPI"],
 
     commands: [

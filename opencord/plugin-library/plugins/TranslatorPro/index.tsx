@@ -96,7 +96,8 @@ export default definePlugin({
     name: "TranslatorPro",
     description: "Extended translator: Google (same API as Translate), DeepL, DeepSeek, optional „Stil-Stimme“ rewrite (DeepSeek + custom prompt), backup engine, auto-translate, /tp. Coexists with the built-in Translate plugin.",
     authors: [Devs.Ven],
-    tags: ["translate", "translation", "translator", "TranslatorPro", "deepl", "deepseek", "google", "Heino"],
+    tags: ["Chat", "Utility"],
+    enabledByDefault: true,
     settings,
 
     contextMenus: {

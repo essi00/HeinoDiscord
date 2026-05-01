@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "name": "HeinoDiscord Plugin Registry",
+  "description": "Static, open-source plugin registry. Host this file on GitHub Pages, raw GitHub, or any plain HTTPS server.",
+  "license": "GPL-3.0-or-later",
+  "plugins": [
+    {
+      "name": "QuickTemplates",
+      "source": "opencord/plugin-library/plugins/QuickTemplates",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "LinkSafety",
+      "source": "opencord/plugin-library/plugins/LinkSafety",
+      "recommended": true,
+      "privacy": "local-only",
+      "network": []
+    },
+    {
+      "name": "TranslatorPro",
+      "source": "opencord/plugin-library/plugins/TranslatorPro",
+      "recommended": true,
+      "privacy": "translation-request-only",
+      "network": ["Google Translate compatible endpoint", "optional DeepL", "optional DeepSeek"]
+    },
+    {
+      "name": "LocalChatExporter",
+      "source": "opencord/plugin-library/plugins/LocalChatExporter",
+      "recommended": true,
+      "privacy": "exports only messages already loaded in the local client",
+      "network": []
+    }
+  ]
+}

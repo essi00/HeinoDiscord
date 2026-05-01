@@ -1,12 +1,17 @@
 # OpenCord
 
-OpenCord is an independent GPL Discord client mod distribution built on the
+HeinoDiscord is the user-facing product package for this repository. It includes
+a Windows installer named `HeinoDiscord.exe`, a recommended plugin profile, and
+a static open plugin registry.
+
+OpenCord is the independent GPL Discord client mod engine built on the
 Vencord-compatible plugin architecture. It keeps compatibility with existing
 Vencord plugins while adding OpenCord tooling for a curated plugin library and
 user-created plugins.
 
 Start here:
 
+- [HeinoDiscord product guide](./HEINODISCORD.md)
 - [OpenCord overview](./OPENCORD.md)
 - [Fork notice](./FORK_NOTICE.md)
 - [Plugin development](./opencord/docs/PLUGIN_DEVELOPMENT.md)

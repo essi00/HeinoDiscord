@@ -80,6 +80,7 @@ export default definePlugin({
     description: "Expand local support/chat templates before sending, e.g. ;;hello. No network calls, no external storage.",
     authors: [{ name: "Open Plugin Library", id: 0n }],
     tags: ["Chat", "Utility"],
+    enabledByDefault: true,
     settings,
 
     onBeforeMessageSend(channelId, msg) {

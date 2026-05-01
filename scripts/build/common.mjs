@@ -225,9 +225,9 @@ export const gitRemotePlugin = {
             namespace: "git-remote", path: args.path
         }));
         build.onLoad({ filter, namespace: "git-remote" }, async () => {
-            let remote = process.env.VENCORD_REMOTE;
+            let remote = process.env.HEINODISCORD_REMOTE ?? process.env.VENCORD_REMOTE;
             if (!remote) {
-                for (const name of ["origin", "upstream"]) {
+                for (const name of ["origin"]) {
                     try {
                         const res = await promisify(exec)(`git remote get-url ${name}`, { encoding: "utf-8" });
                         remote = res.stdout.trim();
@@ -235,7 +235,7 @@ export const gitRemotePlugin = {
                     } catch { }
                 }
 
-                remote = remote
+                remote = (remote || "HeinoDiscord/OpenCord")
                     ?.replace("https://github.com/", "")
                     .replace("git@github.com:", "")
                     .replace(/.git$/, "") ?? "";

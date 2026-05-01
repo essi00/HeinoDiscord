@@ -1,8 +1,8 @@
 {
-    "name": "opencord",
+    "name": "heinodiscord",
     "private": "true",
     "version": "1.14.11",
-    "description": "An independent GPL Discord client mod distribution with Vencord-compatible plugins",
+    "description": "HeinoDiscord, an open-source Discord client mod distribution with Vencord-compatible plugins",
     "homepage": "https://example.invalid/opencord",
     "bugs": {
         "url": "https://example.invalid/opencord/issues"
@@ -32,6 +32,9 @@
         "opencord:patch": "node opencord/scripts/run-powershell.mjs opencord/scripts/build-and-patch.ps1",
         "opencord:auto-repatch": "node opencord/scripts/run-powershell.mjs opencord/scripts/auto-repatch.ps1",
         "opencord:register-auto-repatch": "node opencord/scripts/run-powershell.mjs opencord/scripts/register-auto-repatch.ps1",
+        "heino:profile": "node opencord/scripts/apply-profile.mjs",
+        "heino:build-installer": "node opencord/scripts/run-powershell.mjs opencord/scripts/build-installer.ps1",
+        "heino:package": "node opencord/scripts/run-powershell.mjs opencord/scripts/package-release.ps1",
         "uninject": "node scripts/runInstaller.mjs -- --uninstall",
         "lint": "eslint",
         "lint-styles": "stylelint \"src/**/*.css\" --ignore-pattern src/userplugins",

@@ -52,6 +52,18 @@ Full install of selected plugins plus patch:
 pnpm opencord:plugins -- -Plugins "QuickTemplates,LinkSafety,TranslatorPro,LocalChatExporter,LastSeenTracker" -PruneUserPlugins -Build -Patch
 ```
 
+Build the HeinoDiscord installer:
+
+```powershell
+pnpm heino:build-installer
+```
+
+Build a release package:
+
+```powershell
+pnpm heino:package
+```
+
 ## Plugin Library
 
 The built-in plugin library lives in:

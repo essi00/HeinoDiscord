@@ -85,7 +85,7 @@ export function TranslatorProSettingsPanel() {
                 <Forms.FormText className={Margins.bottom8}>
                     Required for DeepL / DeepSeek. Google uses the built-in client key (same as Vencord Translate).
                 </Forms.FormText>
-                <Forms.FormTitle tag="h5" className={Margins.bottom4}>DeepL API key</Forms.FormTitle>
+                <Forms.FormTitle tag="h5" className={Margins.bottom8}>DeepL API key</Forms.FormTitle>
                 <TextInput
                     placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx"
                     value={deepLKey}
@@ -98,13 +98,13 @@ export function TranslatorProSettingsPanel() {
                     onChange={(v: boolean) => settings.store.deepLPaid = v}
                     hideBorder
                 />
-                <Forms.FormTitle tag="h5" className={Margins.top16 + " " + Margins.bottom4}>DeepSeek API key</Forms.FormTitle>
+                <Forms.FormTitle tag="h5" className={Margins.top16 + " " + Margins.bottom8}>DeepSeek API key</Forms.FormTitle>
                 <TextInput
                     placeholder="sk-..."
                     value={deepSeekKey}
                     onChange={v => { settings.store.deepSeekKey = v; }}
                 />
-                <Forms.FormTitle tag="h5" className={Margins.top16 + " " + Margins.bottom4}>Stil-Stimme — System-Prompt (optional)</Forms.FormTitle>
+                <Forms.FormTitle tag="h5" className={Margins.top16 + " " + Margins.bottom8}>Stil-Stimme — System-Prompt (optional)</Forms.FormTitle>
                 <Forms.FormText className={Margins.bottom8}>
                     Nur für die Engine „Stil-Stimme“. Leer lassen = eingebauter Ton (informell, motivierend, kurze Sätze). Du kannst hier eigenen Ton beschreiben oder Beispiele einfügen, die du selbst schreibst.
                 </Forms.FormText>

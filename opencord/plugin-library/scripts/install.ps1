@@ -146,7 +146,9 @@ if ($Build) {
 if ($Patch) {
     Push-Location $VencordRoot
     try {
-        if (Test-Path -LiteralPath (Join-Path $VencordRoot "scripts\patchAllDiscordRoaming.mjs")) {
+        if (Test-Path -LiteralPath (Join-Path $VencordRoot "opencord\scripts\build-and-patch.ps1")) {
+            powershell.exe -NoProfile -ExecutionPolicy Bypass -File "opencord\scripts\build-and-patch.ps1"
+        } elseif (Test-Path -LiteralPath (Join-Path $VencordRoot "scripts\patchAllDiscordRoaming.mjs")) {
             node "scripts\patchAllDiscordRoaming.mjs"
         } else {
             pnpm inject

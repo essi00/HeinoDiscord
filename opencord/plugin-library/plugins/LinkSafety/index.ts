@@ -83,6 +83,7 @@ export default definePlugin({
     description: "Locally blocks obviously suspicious links before they are sent. No external lookups.",
     authors: [{ name: "Open Plugin Library", id: 0n }],
     tags: ["Privacy", "Utility"],
+    enabledByDefault: true,
     settings,
 
     onBeforeMessageSend(channelId, msg) {
