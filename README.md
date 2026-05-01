@@ -35,12 +35,15 @@ For DM exports without a bot, import Discord's official account data package:
 [Data package import](./HEINODISCORD_DATA_PACKAGE_IMPORT.md). It does not use a
 token, but it is limited to messages Discord includes in your package.
 
+Export safety policy: [HeinoDiscord export safety](./HEINODISCORD_EXPORT_SAFETY.md).
+
 Start here:
 
 - [HeinoDiscord product guide](./HEINODISCORD.md)
 - [HeinoDiscord tutorial](./HEINODISCORD_TUTORIAL.md)
 - [GitHub publishing](./GITHUB_PUBLISHING.md)
 - [HeinoDiscord plugin API](./HEINODISCORD_PLUGIN_API.md)
+- [Export safety](./HEINODISCORD_EXPORT_SAFETY.md)
 - [OpenCord overview](./OPENCORD.md)
 - [Fork notice](./FORK_NOTICE.md)
 - [Plugin development](./opencord/docs/PLUGIN_DEVELOPMENT.md)

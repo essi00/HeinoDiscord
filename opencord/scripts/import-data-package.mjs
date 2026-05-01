@@ -39,7 +39,7 @@ Usage:
 Options:
   --input <path>          Discord data package zip or extracted package folder.
   --out <dir>             Output directory. Default: exports/discord-data-package/<time>
-  --format <type>         json, markdown, or both. Default: both.
+  --format <type>         json, markdown, html, both, or all. Default: all.
   --all                   Include server channels too. Default imports only DMs/group DMs.
   --help                  Show this help.
 
@@ -56,12 +56,18 @@ if (args.help) usage(0);
 
 const input = args.input ? resolve(args.input) : "";
 const outputRoot = resolve(args.out || join("exports", "discord-data-package", new Date().toISOString().replace(/[:.]/g, "-")));
-const format = args.format || "both";
+const format = args.format || "all";
 const includeAll = !!args.all;
 
 if (!input || !existsSync(input)) usage();
-if (!["json", "markdown", "both"].includes(format)) {
-    throw new Error("--format must be json, markdown, or both");
+if (!["json", "markdown", "html", "both", "all"].includes(format)) {
+    throw new Error("--format must be json, markdown, html, both, or all");
+}
+
+function shouldWrite(targetFormat) {
+    if (format === "all") return true;
+    if (format === "both") return targetFormat === "json" || targetFormat === "markdown";
+    return format === targetFormat;
 }
 
 function safeName(name) {
@@ -185,6 +191,121 @@ function markdownFor(channel, messages) {
     return lines.join("\n");
 }
 
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function attachmentLinks(attachments) {
+    return String(attachments || "")
+        .split(/\s+/)
+        .map(url => url.trim())
+        .filter(Boolean)
+        .map(url => `<a href="${escapeHtml(url)}" rel="noreferrer">${escapeHtml(url)}</a>`)
+        .join("<br>");
+}
+
+function htmlShell(title, body) {
+    return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #101114;
+  --panel: #181a20;
+  --panel-2: #20232b;
+  --text: #e8eaf0;
+  --muted: #9da3b3;
+  --line: #303443;
+  --accent: #7aa2ff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+main { max-width: 980px; margin: 0 auto; padding: 28px 18px 48px; }
+h1 { font-size: 24px; margin: 0 0 6px; }
+.meta { color: var(--muted); margin: 0 0 18px; }
+.notice {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 16px 0 22px;
+}
+.message {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: 14px;
+  border-top: 1px solid var(--line);
+  padding: 14px 0;
+}
+.time { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.attachments { margin-top: 8px; color: var(--muted); overflow-wrap: anywhere; }
+a { color: var(--accent); }
+ul { padding-left: 20px; }
+li { margin: 7px 0; }
+@media (max-width: 640px) {
+  .message { grid-template-columns: 1fr; gap: 6px; }
+}
+</style>
+</head>
+<body>
+<main>
+${body}
+</main>
+</body>
+</html>
+`;
+}
+
+function htmlFor(channel, messages) {
+    const body = [
+        `<h1>${escapeHtml(channel.displayName)}</h1>`,
+        `<p class="meta">Channel ID: ${escapeHtml(channel.channelId)} · Imported at ${escapeHtml(new Date().toISOString())} · Messages in package: ${messages.length}</p>`,
+        `<div class="notice">Discord account data packages include messages sent by the account owner. They are not a full transcript of every message from every participant.</div>`
+    ];
+
+    for (const message of messages) {
+        body.push(`<article class="message">
+  <div class="time">${escapeHtml(message.timestamp || "unknown time")}<br>${escapeHtml(message.id || "")}</div>
+  <div>
+    <div class="content">${escapeHtml(message.content || "") || "<em>No text content</em>"}</div>
+    ${message.attachments ? `<div class="attachments">${attachmentLinks(message.attachments)}</div>` : ""}
+  </div>
+</article>`);
+    }
+
+    return htmlShell(channel.displayName, body.join("\n"));
+}
+
+function indexHtml(summary) {
+    const items = summary.channels
+        .map(channel => `<li><a href="channels/${escapeHtml(channel.files?.html || "")}">${escapeHtml(channel.displayName)}</a> <span class="meta">${channel.messageCount} messages · ${escapeHtml(channel.channelId)}</span></li>`)
+        .join("\n");
+
+    return htmlShell("HeinoDiscord Data Package Import", `
+<h1>HeinoDiscord Data Package Import</h1>
+<p class="meta">Imported at ${escapeHtml(summary.importedAt)} · Channels: ${summary.channels.length}</p>
+<div class="notice">${escapeHtml(summary.note)}</div>
+<ul>
+${items}
+</ul>
+`);
+}
+
 function runPowerShellExtract(zipPath, destination) {
     const commands = [
         ["powershell.exe", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", `Expand-Archive -LiteralPath ${JSON.stringify(zipPath)} -DestinationPath ${JSON.stringify(destination)} -Force`]],
@@ -274,7 +395,10 @@ async function main() {
         const displayName = String(indexName || channelJson?.name || entry.name);
         const baseName = `${safeName(displayName)}-${channelId}`;
 
-        if (format === "json" || format === "both") {
+        const files = {};
+
+        if (shouldWrite("json")) {
+            files.json = `${baseName}.json`;
             await writeFile(join(channelsOut, `${baseName}.json`), `${JSON.stringify({
                 channelId,
                 displayName,
@@ -285,8 +409,14 @@ async function main() {
             }, null, 2)}\n`);
         }
 
-        if (format === "markdown" || format === "both") {
+        if (shouldWrite("markdown")) {
+            files.markdown = `${baseName}.md`;
             await writeFile(join(channelsOut, `${baseName}.md`), markdownFor({ channelId, displayName }, messages));
+        }
+
+        if (shouldWrite("html")) {
+            files.html = `${baseName}.html`;
+            await writeFile(join(channelsOut, `${baseName}.html`), htmlFor({ channelId, displayName }, messages));
         }
 
         summary.channels.push({
@@ -294,11 +424,15 @@ async function main() {
             channelId,
             displayName,
             isDm: dm,
-            messageCount: messages.length
+            messageCount: messages.length,
+            files
         });
     }
 
     await writeFile(join(outputRoot, "import-summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
+    if (shouldWrite("html")) {
+        await writeFile(join(outputRoot, "index.html"), indexHtml(summary));
+    }
 
     console.log(`[import] Package: ${packageRoot}`);
     console.log(`[import] Channels: ${summary.channels.length}`);

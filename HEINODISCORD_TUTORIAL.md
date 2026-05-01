@@ -97,7 +97,8 @@ pnpm heino:import-data-package -- --input "C:\Path\To\discord-data-package.zip"
 ```
 
 That path does not use a token, but Discord's package only includes messages
-sent by your account.
+sent by your account. It writes local HTML, JSON, and Markdown archives by
+default.
 
 ## Enable Optional LastSeenTracker
 

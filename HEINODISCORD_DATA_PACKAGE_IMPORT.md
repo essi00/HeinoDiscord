@@ -1,7 +1,8 @@
 # HeinoDiscord Discord Data Package Import
 
 This importer converts Discord's official account data package into readable DM
-archives without using a bot token, user token, or selfbot.
+archives without using a bot token, user token, or selfbot. It is the safe,
+local-first HeinoDiscord alternative to token-based chat export tools.
 
 ## Important Limit
 
@@ -52,6 +53,12 @@ JSON only:
 pnpm heino:import-data-package -- --input "C:\Path\To\package" --format json
 ```
 
+HTML only:
+
+```powershell
+pnpm heino:import-data-package -- --input "C:\Path\To\package" --format html
+```
+
 Include server message folders from the data package too:
 
 ```powershell
@@ -68,9 +75,14 @@ pnpm heino:import-data-package -- --input "C:\Path\To\package" --out "exports\my
 
 ```text
 exports/discord-data-package/<time>/import-summary.json
+exports/discord-data-package/<time>/index.html
 exports/discord-data-package/<time>/channels/*.json
 exports/discord-data-package/<time>/channels/*.md
+exports/discord-data-package/<time>/channels/*.html
 ```
 
 The importer uses the package's `messages/index.json`, each message folder's
 `channel.json`, and each `messages.csv`.
+
+The HTML output is fully local. It uses inline CSS, escapes message content, and
+does not load external scripts or remote assets.
