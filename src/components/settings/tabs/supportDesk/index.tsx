@@ -7,9 +7,9 @@
 import "./styles.css";
 
 import { Settings } from "@api/Settings";
-import { clearDoneTickets, clearIgnoredTickets, createSupportTrackerOptions, formatDue, formatRelativeTime, getActionableTickets, getTicketStats, ignoreTicket, loadSupportState, markDone, markNeedsReply, openSupportTicket, QueueState, snoozeTicket, SupportTrackerOptions, TicketRecord, ticketScope } from "@api/SupportDesk";
+import { addSupportGuild, classifySupportChannel, clearDoneTickets, clearIgnoredTickets, clearOutOfScopeTickets, createSupportTrackerOptions, DEFAULT_SUPPORT_CONFIG, formatDue, formatRelativeTime, getActionableTickets, getConfiguredGuilds, getCurrentChannelSource, getTicketStats, ignoreTicket, loadSupportConfig, loadSupportState, markDone, markNeedsReply, openSupportTicket, PreferredSupportLanguage, QueueState, removeSupportGuild, setPreferredLanguage, setTrackDms, snoozeTicket, SupportDeskConfig, SupportTrackerOptions, TicketRecord, ticketScope, trainSupportChannel } from "@api/SupportDesk";
 import { Button } from "@components/Button";
-import { ClockIcon, CogWheel, DeleteIcon, NoEntrySignIcon, ReplyIcon } from "@components/Icons";
+import { ClockIcon, CogWheel, DeleteIcon, NoEntrySignIcon, NotesIcon, ReplyIcon } from "@components/Icons";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
 import { openPluginModal } from "@components/settings/tabs/plugins/PluginModal";
@@ -52,6 +52,10 @@ function ActionButton({ icon, children, ...props }: React.ComponentProps<typeof 
     );
 }
 
+function Pill({ children, tone }: { children: React.ReactNode; tone?: "danger" | "warning" | "success"; }) {
+    return <span className={cl("pill", tone)}>{children}</span>;
+}
+
 function TicketCard({ ticket, refresh }: { ticket: TicketRecord; refresh(): Promise<void>; }) {
     const overdue = Boolean(ticket.dueAt && ticket.dueAt <= Date.now());
     const dueSoon = Boolean(ticket.dueAt && ticket.dueAt > Date.now() && ticket.dueAt <= Date.now() + 60 * 60 * 1000);
@@ -76,7 +80,15 @@ function TicketCard({ ticket, refresh }: { ticket: TicketRecord; refresh(): Prom
                     <span>{ticket.reason}</span>
                     {ticket.unreadCount ? <span>{ticket.unreadCount} unread since last reply</span> : null}
                     <span>Activity {formatRelativeTime(ticket.lastActivityAt)}</span>
+                    {ticket.language ? <span>{ticket.language}</span> : null}
+                    {typeof ticket.classifierScore === "number" ? <span>score {ticket.classifierScore}</span> : null}
                 </div>
+
+                {ticket.classifierReasons?.length ? (
+                    <div className={cl("reason-list")}>
+                        {ticket.classifierReasons.slice(0, 3).map(reason => <Pill key={reason}>{reason}</Pill>)}
+                    </div>
+                ) : null}
 
                 {ticket.lastSnippet && (
                     <blockquote className={cl("snippet")}>
@@ -99,8 +111,8 @@ function TicketCard({ ticket, refresh }: { ticket: TicketRecord; refresh(): Prom
                 <ActionButton icon={<ClockIcon className={cl("button-icon")} />} variant="secondary" onClick={() => run("Support conversation snoozed until tomorrow.", () => snoozeTicket(ticket.channelId, 24, getTrackerOptions()))}>
                     24h
                 </ActionButton>
-                <ActionButton icon={<NoEntrySignIcon className={cl("button-icon")} />} variant="dangerSecondary" onClick={() => run("Support conversation ignored locally.", () => ignoreTicket(ticket.channelId, getTrackerOptions()))}>
-                    Ignore
+                <ActionButton icon={<NoEntrySignIcon className={cl("button-icon")} />} variant="dangerSecondary" onClick={() => run("Conversation ignored and trained as not support.", () => ignoreTicket(ticket.channelId, getTrackerOptions(), true))}>
+                    Not support
                 </ActionButton>
             </div>
         </article>
@@ -109,20 +121,46 @@ function TicketCard({ ticket, refresh }: { ticket: TicketRecord; refresh(): Prom
 
 function SupportDeskTab() {
     const [state, setState] = useState<QueueState>(EMPTY_STATE);
+    const [config, setConfig] = useState<SupportDeskConfig>(DEFAULT_SUPPORT_CONFIG);
     const [selectedChannelId, setSelectedChannelId] = useState<string | undefined>(SelectedChannelStore.getChannelId?.());
-    const actionable = useMemo(() => getActionableTickets(state), [state]);
-    const stats = useMemo(() => getTicketStats(state), [state]);
+    const source = useMemo(() => getCurrentChannelSource(selectedChannelId), [selectedChannelId]);
+    const configuredGuilds = useMemo(() => getConfiguredGuilds(config), [config]);
+    const actionable = useMemo(() => getActionableTickets(state, Date.now(), config), [state, config]);
+    const stats = useMemo(() => getTicketStats(state, Date.now(), config), [state, config]);
     const currentTicket = selectedChannelId ? state.tickets[selectedChannelId] : undefined;
+    const currentClassification = useMemo(() =>
+        selectedChannelId ? classifySupportChannel(selectedChannelId, {}, config, getTrackerOptions()) : undefined,
+    [selectedChannelId, config]);
 
     async function refresh() {
         setSelectedChannelId(SelectedChannelStore.getChannelId?.());
-        setState(await loadSupportState());
+        const [nextState, nextConfig] = await Promise.all([loadSupportState(), loadSupportConfig()]);
+        setState(nextState);
+        setConfig(nextConfig);
     }
 
     async function run(label: string, action: () => Promise<unknown>) {
         await action();
         showToast(label, Toasts.Type.SUCCESS, { position: Toasts.Position.BOTTOM });
         await refresh();
+    }
+
+    async function watchCurrent() {
+        if (!selectedChannelId) return;
+        if (!source.isDm && source.guildId) await addSupportGuild(source.guildId);
+        await trainSupportChannel(selectedChannelId, true);
+        await markNeedsReply(selectedChannelId, "manual watch", getTrackerOptions(), {}, undefined, true);
+    }
+
+    async function notSupportCurrent() {
+        if (!selectedChannelId) return;
+        await trainSupportChannel(selectedChannelId, false);
+        await ignoreTicket(selectedChannelId, getTrackerOptions(), false);
+    }
+
+    async function updateLanguage(preferredLanguage: PreferredSupportLanguage) {
+        await setPreferredLanguage(preferredLanguage);
+        await clearOutOfScopeTickets();
     }
 
     useEffect(() => {
@@ -137,7 +175,7 @@ function SupportDeskTab() {
                 <div>
                     <h2 className={cl("title")}>Support Desk</h2>
                     <Paragraph className={cl("intro")}>
-                        Automatic local inbox for DMs and ticket channels you open or receive messages in. Conversations stay here until you reply, snooze, ignore, or mark them done.
+                        Local support inbox for selected workspaces only. It classifies support conversations, filters non-English-script tickets when English-only is active, and reminds you until you reply, snooze, or ignore.
                     </Paragraph>
                 </div>
 
@@ -148,6 +186,59 @@ function SupportDeskTab() {
                     <ActionButton icon={<ReplyIcon className={cl("button-icon")} />} onClick={() => void refresh()}>
                         Refresh
                     </ActionButton>
+                </div>
+            </section>
+
+            <section className={cl("workspace")}>
+                <div>
+                    <div className={cl("eyebrow")}>Support sources</div>
+                    <div className={cl("workspace-title")}>
+                        {source.isDm
+                            ? "Current source: Direct Messages"
+                            : source.guildName
+                                ? `Current server: ${source.guildName}`
+                                : "Current source: no server selected"}
+                    </div>
+                    <div className={cl("workspace-note")}>
+                        Guild channels are tracked only after you add the server as a support workspace. This stops random servers from polluting the queue.
+                    </div>
+                </div>
+
+                <div className={cl("actions")}>
+                    {!source.isDm && source.guildId && !config.trackedGuildIds.includes(source.guildId) && (
+                        <ActionButton icon={<NotesIcon className={cl("button-icon")} />} onClick={() => run("Server added as support workspace.", () => addSupportGuild(source.guildId!))}>
+                            Add server
+                        </ActionButton>
+                    )}
+                    {!source.isDm && source.guildId && config.trackedGuildIds.includes(source.guildId) && (
+                        <ActionButton icon={<DeleteIcon className={cl("button-icon")} />} variant="dangerSecondary" onClick={() => run("Server removed from support workspaces.", () => removeSupportGuild(source.guildId!))}>
+                            Remove server
+                        </ActionButton>
+                    )}
+                    <ActionButton icon={<ReplyIcon className={cl("button-icon")} />} variant={config.trackDms ? "positive" : "secondary"} onClick={() => run(config.trackDms ? "DM tracking disabled." : "DM tracking enabled.", () => setTrackDms(!config.trackDms))}>
+                        DMs {config.trackDms ? "on" : "off"}
+                    </ActionButton>
+                    <ActionButton icon={<NotesIcon className={cl("button-icon")} />} variant={config.preferredLanguage === "english" ? "positive" : "secondary"} onClick={() => run("Language filter set to English only.", () => updateLanguage("english"))}>
+                        English only
+                    </ActionButton>
+                    <ActionButton icon={<NotesIcon className={cl("button-icon")} />} variant={config.preferredLanguage === "all" ? "positive" : "secondary"} onClick={() => run("Language filter allows all languages.", () => updateLanguage("all"))}>
+                        All languages
+                    </ActionButton>
+                    <ActionButton icon={<DeleteIcon className={cl("button-icon")} />} variant="dangerSecondary" onClick={() => run("Out-of-scope conversations cleared.", clearOutOfScopeTickets)}>
+                        Clear random
+                    </ActionButton>
+                </div>
+
+                <div className={cl("source-list")}>
+                    {configuredGuilds.length
+                        ? configuredGuilds.map(guild => <Pill key={guild.id} tone="success">{guild.name}</Pill>)
+                        : <Pill tone="warning">No support servers selected yet</Pill>}
+                    <Pill tone={config.preferredLanguage === "english" ? "success" : undefined}>
+                        {config.preferredLanguage === "english" ? "English-only filter" : "All languages"}
+                    </Pill>
+                    <Pill tone={config.trackDms ? "success" : undefined}>
+                        DMs {config.trackDms ? "tracked" : "ignored"}
+                    </Pill>
                 </div>
             </section>
 
@@ -166,7 +257,9 @@ function SupportDeskTab() {
                     <div className={cl("current-note")}>
                         {currentTicket
                             ? `${currentTicket.status} - ${formatDue(currentTicket)}`
-                            : "Not tracked yet. Add it when you know you need to answer later."}
+                            : currentClassification
+                                ? `${currentClassification.isSupport ? "Classifier would track this" : "Classifier will ignore this"} - score ${currentClassification.score}/${currentClassification.threshold} - ${currentClassification.reasons.slice(0, 2).join(", ")}`
+                                : "No current classifier signal."}
                     </div>
                 </div>
 
@@ -174,7 +267,7 @@ function SupportDeskTab() {
                     <ActionButton
                         icon={<ClockIcon className={cl("button-icon")} />}
                         disabled={!selectedChannelId}
-                        onClick={() => selectedChannelId && run("Current conversation added to Support Desk.", () => markNeedsReply(selectedChannelId, "manual watch", getTrackerOptions(), {}, undefined, true))}
+                        onClick={() => selectedChannelId && run("Current conversation added and trained as support.", watchCurrent)}
                     >
                         Watch
                     </ActionButton>
@@ -193,6 +286,14 @@ function SupportDeskTab() {
                         onClick={() => selectedChannelId && run("Current conversation snoozed for 2 hours.", () => snoozeTicket(selectedChannelId, 2, getTrackerOptions()))}
                     >
                         Snooze
+                    </ActionButton>
+                    <ActionButton
+                        icon={<NoEntrySignIcon className={cl("button-icon")} />}
+                        variant="dangerSecondary"
+                        disabled={!selectedChannelId}
+                        onClick={() => selectedChannelId && run("Current conversation trained as not support.", notSupportCurrent)}
+                    >
+                        Not support
                     </ActionButton>
                 </div>
             </section>
@@ -215,7 +316,7 @@ function SupportDeskTab() {
                     : (
                         <div className={cl("empty")}>
                             <div className={cl("empty-title")}>Nothing is waiting on you.</div>
-                            <Paragraph>When you open a support DM or ticket channel and do not answer, it will appear here automatically.</Paragraph>
+                            <Paragraph>Add the server you support, keep English-only on, and the classifier will only surface conversations that look like support work.</Paragraph>
                         </div>
                     )}
             </section>

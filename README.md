@@ -51,8 +51,9 @@ primary `HeinoDiscord.*` product surface:
 - `/collect-links`: local link index export as JSON, CSV, or Markdown.
 - `/attachment-index`: local attachment metadata index export.
 - `/privacy-scan`: local redacted sensitive-pattern scan and report export.
-- `Support Desk`: visible local support inbox with Watch, Open, Done, Snooze,
-  Ignore, overdue stats, and automatic reminders.
+- `Support Desk`: visible local support inbox with selected support servers,
+  English-only filtering, local ticket classification, Watch, Open, Done,
+  Snooze, Not support, overdue stats, chat-bar access, and reminders.
 - `/security-scan`: local scam/RAT scan for loaded messages.
 - `/privacy-check`: local outbound customer-data check.
 - `/secure-vault`: local AES-GCM encrypted support note vault.

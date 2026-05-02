@@ -107,9 +107,9 @@
       "category": "support",
       "recommended": true,
       "advanced": false,
-      "description": "Automatic local support inbox feeding the visible Support Desk UI with opened tickets, incoming messages, snooze, done, and ignore workflows.",
-      "dependencies": ["CommandsAPI"],
-      "privacy": "Stores ticket reminder metadata and redacted last-message snippets locally in HeinoDiscordData; no token is read and nothing is uploaded."
+      "description": "Automatic local support inbox with workspace selection, English-only filtering, smart ticket classification, chat button access, snooze, done, and ignore workflows.",
+      "dependencies": ["CommandsAPI", "ChatInputButtonAPI"],
+      "privacy": "Stores support source config, classifier metadata, and redacted last-message snippets locally in HeinoDiscordData; no token is read and nothing is uploaded."
     },
     {
       "name": "ScamShield",

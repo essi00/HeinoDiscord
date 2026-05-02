@@ -4,56 +4,63 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { ChatBarButton, ChatBarButtonFactory } from "@api/ChatButtons";
 import { ApplicationCommandInputType, ApplicationCommandOptionType, findOption, sendBotMessage } from "@api/Commands";
 import { definePluginSettings } from "@api/Settings";
-import { clearDoneTickets, createSupportTrackerOptions, formatDue, getActionableTickets, ignoreTicket, loadSupportState, markDone, markNeedsReply, saveSupportState, snoozeTicket, ticketScope } from "@api/SupportDesk";
+import { clearDoneTickets, createSupportTrackerOptions, formatDue, getActionableTickets, ignoreTicket, loadSupportConfig, loadSupportState, markDone, markNeedsReply, saveSupportState, snoozeTicket, ticketScope } from "@api/SupportDesk";
+import { NotesIcon } from "@components/Icons";
 import definePlugin, { OptionType } from "@utils/types";
-import { SelectedChannelStore, showToast, Toasts, UserStore } from "@webpack/common";
+import { React, SelectedChannelStore, SettingsRouter, showToast, Toasts, UserStore } from "@webpack/common";
 
 const settings = definePluginSettings({
     enabledForDms: {
         type: OptionType.BOOLEAN,
-        description: "Track DMs as support conversations.",
+        description: "Allow DMs to become support conversations when DM tracking is enabled in Support Desk.",
         default: true
     },
     enabledForMatchingChannels: {
         type: OptionType.BOOLEAN,
-        description: "Track guild channels whose name matches the ticket keyword pattern.",
+        description: "Allow guild channels to be classified as support conversations inside configured support workspaces.",
         default: true
     },
     ticketNamePattern: {
         type: OptionType.STRING,
-        description: "Case-insensitive channel-name pattern for ticket channels.",
-        default: "ticket|support|order|customer|kunde|case"
+        description: "Fallback support keyword pattern. Smart classification also uses category, topic, and message text.",
+        default: "ticket|support|order|customer|case|help|billing|refund|invoice|shipping|delivery|license|activation"
+    },
+    smartClassification: {
+        type: OptionType.BOOLEAN,
+        description: "Use local scoring to detect support channels instead of requiring an exact ticket channel name.",
+        default: true
     },
     markOpenedAsNeedsReply: {
         type: OptionType.BOOLEAN,
-        description: "When you open a ticket-like channel, mark it as needing a reply until you send one.",
+        description: "When you open a classified support conversation, mark it as needing a reply until you send one.",
         default: true
     },
     autoMarkReplySent: {
         type: OptionType.BOOLEAN,
-        description: "Automatically mark a tracked ticket done when you send a reply.",
+        description: "Automatically mark a tracked support conversation done when you send a reply.",
         default: true
     },
     replySlaHours: {
         type: OptionType.NUMBER,
-        description: "Default reply deadline in hours after opening or receiving a ticket message.",
+        description: "Default reply deadline in hours after opening or receiving a support message.",
         default: 12
     },
     reminderMinutes: {
         type: OptionType.NUMBER,
-        description: "Minimum minutes between local overdue reminders for the same ticket.",
+        description: "Minimum minutes between local overdue reminders for the same conversation.",
         default: 30
     },
     toastNewTickets: {
         type: OptionType.BOOLEAN,
-        description: "Show a local toast when a new support conversation starts needing a reply.",
+        description: "Show a local toast when Support Desk adds a new conversation that needs a reply.",
         default: true
     },
     postLocalReminderInChannel: {
         type: OptionType.BOOLEAN,
-        description: "Also post a local-only bot reminder in the overdue ticket channel when it is selected.",
+        description: "Also post a local-only bot reminder in the overdue conversation when it is selected.",
         default: true
     }
 });
@@ -69,7 +76,7 @@ function compactSnippet(content: string) {
         .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[email]")
         .replace(/\b(?:\+?\d[\d\s().-]{7,}\d)\b/g, "[phone]")
         .replace(/\b\d{12,19}\b/g, "[number]")
-        .replace(/\b\d{1,5}\s+[A-Za-z0-9.' -]{2,40}\s+(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|platz|strasse|straße|weg)\b/gi, "[address]")
+        .replace(/\b\d{1,5}\s+[A-Za-z0-9.' -]{2,40}\s+(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|platz|strasse|weg)\b/gi, "[address]")
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 180);
@@ -81,8 +88,9 @@ function authorName(message: any) {
 
 async function checkOverdue() {
     const state = await loadSupportState();
-    const open = getActionableTickets(state);
+    const config = await loadSupportConfig();
     const currentTime = Date.now();
+    const open = getActionableTickets(state, currentTime, config);
     const reminderMs = Math.max(1, settings.store.reminderMinutes) * 60 * 1000;
     const selectedChannelId = SelectedChannelStore.getChannelId?.();
     let changed = false;
@@ -103,7 +111,7 @@ async function checkOverdue() {
 
         if (settings.store.postLocalReminderInChannel && selectedChannelId === ticket.channelId) {
             sendBotMessage(ticket.channelId, {
-                content: "Support Desk: this conversation is overdue. Open User Settings > HeinoDiscord Settings > Support Desk to act on it."
+                content: "Support Desk: this conversation is overdue. Click the Support Desk chat button or open User Settings > HeinoDiscord Settings > Support Desk."
             });
         }
     }
@@ -113,28 +121,47 @@ async function checkOverdue() {
 
 async function showFallbackDashboard(channelId: string) {
     const state = await loadSupportState();
-    const open = getActionableTickets(state);
+    const config = await loadSupportConfig();
+    const open = getActionableTickets(state, Date.now(), config);
 
     sendBotMessage(channelId, {
         content: [
             "**Support Desk**",
-            "The main workflow is now the visible UI at User Settings > HeinoDiscord Settings > Support Desk.",
+            "The main workflow is the Support Desk button in chat or User Settings > HeinoDiscord Settings > Support Desk.",
             "",
             open.length
                 ? open.slice(0, 10).map(ticket => `- **${ticketScope(ticket)}**: ${formatDue(ticket)}, ${ticket.reason}`).join("\n")
-                : "No open support tickets tracked locally."
+                : "No open support conversations tracked locally."
         ].join("\n").slice(0, 1900)
     });
 }
 
+const SupportDeskButton: ChatBarButtonFactory = ({ isAnyChat }) => {
+    if (!isAnyChat) return null;
+
+    return React.createElement(
+        ChatBarButton,
+        {
+            tooltip: "Open Support Desk",
+            onClick: () => SettingsRouter.openUserSettings("heino_support_desk")
+        } as any,
+        React.createElement(NotesIcon, { width: 20, height: 20 })
+    );
+};
+
 export default definePlugin({
     name: "SupportQueueGuard",
-    description: "Automatic local support inbox: tracks ticket-like DMs/channels, reminds you when replies are due, and feeds the Support Desk UI.",
+    description: "Automatic local support inbox with workspace selection, language filtering, smart ticket classification, reminders, and a Support Desk chat button.",
     authors: [{ name: "Open Plugin Library", id: 0n }],
     tags: ["Utility", "Notifications", "Organisation"],
     enabledByDefault: true,
-    dependencies: ["CommandsAPI"],
+    dependencies: ["CommandsAPI", "ChatInputButtonAPI"],
     settings,
+
+    chatBarButton: {
+        render: SupportDeskButton,
+        icon: NotesIcon
+    },
 
     start() {
         reminderTimer = setInterval(() => void checkOverdue(), 60_000);
@@ -161,11 +188,11 @@ export default definePlugin({
                 return;
             }
 
-            const content = compactSnippet(message?.content ?? "");
             void markNeedsReply(channelId, "incoming message", options(), {
                 authorName: authorName(message),
-                snippet: content,
-                messageId: message?.id
+                snippet: compactSnippet(message?.content ?? ""),
+                messageId: message?.id,
+                textForClassification: message?.content ?? ""
             }).then(marked => {
                 if (!marked || !settings.store.toastNewTickets) return;
                 showToast("Support Desk added a conversation that needs a reply.", Toasts.Type.MESSAGE, {
@@ -226,7 +253,7 @@ export default definePlugin({
 
             if (action === "ignore") {
                 await ignoreTicket(ctx.channel.id, options());
-                sendBotMessage(ctx.channel.id, { content: "Support Desk: ignoring this conversation locally." });
+                sendBotMessage(ctx.channel.id, { content: "Support Desk: ignoring this conversation locally and training it as not support." });
                 return;
             }
 
@@ -236,7 +263,7 @@ export default definePlugin({
                 return;
             }
 
-            sendBotMessage(ctx.channel.id, { content: "Unknown action. Use the Support Desk UI, or status, watch, done, snooze, ignore, clear-done." });
+            sendBotMessage(ctx.channel.id, { content: "Unknown action. Use the Support Desk button, or status, watch, done, snooze, ignore, clear-done." });
         }
     }]
 });

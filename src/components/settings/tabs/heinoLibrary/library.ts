@@ -59,7 +59,7 @@ export const HEINO_LIBRARY_PLUGINS = [
     {
         name: "SupportQueueGuard",
         category: "Support SLA",
-        commands: ["Support Desk UI", "automatic overdue reminders", "auto done on reply"]
+        commands: ["Support Desk chat button", "server allowlist", "English-only classifier"]
     },
     {
         name: "ScamShield",

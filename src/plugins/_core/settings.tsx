@@ -172,18 +172,18 @@ export default definePlugin({
                 Icon: MainSettingsIcon
             }),
             buildEntry({
-                key: "heino_library",
-                title: "Heino Plugins",
-                panelTitle: "HeinoDiscord Open Plugin Library",
-                Component: HeinoLibraryTab,
-                Icon: PluginsIcon
-            }),
-            buildEntry({
                 key: "heino_support_desk",
                 title: "Support Desk",
                 panelTitle: "HeinoDiscord Support Desk",
                 Component: SupportDeskTab,
                 Icon: NotesIcon
+            }),
+            buildEntry({
+                key: "heino_library",
+                title: "Heino Plugins",
+                panelTitle: "HeinoDiscord Open Plugin Library",
+                Component: HeinoLibraryTab,
+                Icon: PluginsIcon
             }),
             buildEntry({
                 key: "vencord_plugins",

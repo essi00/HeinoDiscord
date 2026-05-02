@@ -136,10 +136,12 @@ They use the loaded in-memory message cache and local browser downloads. They do
 not read account tokens, call Discord's history API, or send exports to a cloud
 service.
 
-For support work, `SupportQueueGuard` now feeds the visible `Support Desk`
-panel. It automatically adds opened/read tickets that still need a reply,
-tracks overdue conversations, and gives you buttons for open, done, snooze, and
-ignore. `ScamShield` warns about fake-support/RAT patterns, and
+For support work, `SupportQueueGuard` feeds the visible `Support Desk` panel and
+chat-bar button. It only tracks servers you add as support workspaces, uses a
+local scoring classifier instead of relying only on channel names, filters
+non-English-script tickets when English-only mode is active, and gives you
+buttons for open, done, snooze, watch, and not-support training.
+`ScamShield` warns about fake-support/RAT patterns, and
 `CustomerPrivacyGuard` blocks accidental customer-data leaks.
 `SecureSupportVault` encrypts local support notes/drafts with WebCrypto AES-GCM;
 it is local note encryption, not Discord E2EE.

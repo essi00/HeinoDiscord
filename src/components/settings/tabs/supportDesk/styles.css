@@ -88,6 +88,7 @@
 }
 
 .vc-support-desk-current,
+.vc-support-desk-workspace,
 .vc-support-desk-ticket,
 .vc-support-desk-empty {
     background: var(--background-secondary);
@@ -95,7 +96,8 @@
     border-radius: 8px;
 }
 
-.vc-support-desk-current {
+.vc-support-desk-current,
+.vc-support-desk-workspace {
     align-items: center;
     display: flex;
     gap: 16px;
@@ -104,6 +106,12 @@
     padding: 14px;
 }
 
+.vc-support-desk-workspace {
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.vc-support-desk-workspace-title,
 .vc-support-desk-current-title {
     color: var(--header-primary);
     font-size: 16px;
@@ -113,11 +121,58 @@
     overflow-wrap: anywhere;
 }
 
+.vc-support-desk-workspace-note,
 .vc-support-desk-current-note {
     color: var(--text-muted);
     font-size: 13px;
     line-height: 18px;
     margin-top: 2px;
+}
+
+.vc-support-desk-source-list,
+.vc-support-desk-reason-list {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.vc-support-desk-source-list {
+    margin-top: 2px;
+}
+
+.vc-support-desk-reason-list {
+    margin-top: 8px;
+}
+
+.vc-support-desk-pill {
+    background: var(--background-modifier-accent);
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 1px 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vc-support-desk-pill-danger {
+    border-color: var(--status-danger);
+    color: var(--status-danger);
+}
+
+.vc-support-desk-pill-warning {
+    border-color: var(--status-warning);
+    color: var(--status-warning);
+}
+
+.vc-support-desk-pill-success {
+    border-color: var(--status-positive);
+    color: var(--status-positive);
 }
 
 .vc-support-desk-list {
@@ -215,7 +270,7 @@
 
 .vc-support-desk-ticket-meta span:not(:last-child)::after {
     color: var(--text-muted);
-    content: "•";
+    content: "|";
     margin-left: 8px;
 }
 
@@ -246,6 +301,7 @@
 @media (width <= 760px) {
     .vc-support-desk-hero,
     .vc-support-desk-current,
+    .vc-support-desk-workspace,
     .vc-support-desk-section-header,
     .vc-support-desk-ticket {
         align-items: stretch;

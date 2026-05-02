@@ -105,13 +105,16 @@ Support Desk panel:
 User Settings -> HeinoDiscord Settings -> Support Desk
 ```
 
-- Watches ticket-like DMs and channels you open or receive messages in.
+- Tracks only DMs, if enabled, and guild servers you add as support workspaces.
+- Uses a local scoring classifier from channel name, category, topic, and
+  incoming text instead of relying only on channels named `ticket`.
+- Filters CJK/non-English-script conversations when English-only mode is active.
 - Marks a ticket done when you send a reply.
 - Shows overdue, due-soon, snoozed, and done counts.
-- Provides buttons for Open, Done, Snooze, Watch, Ignore, and cleanup.
+- Provides buttons for Open, Done, Snooze, Watch, Not support, and cleanup.
 - Keeps `/ticket-guard` only as a fallback for power users.
-- Stores reminder metadata and redacted last-message snippets locally; no token
-  and no cloud sync.
+- Stores source settings, classifier metadata, and redacted last-message
+  snippets locally; no token and no cloud sync.
 
 ### ScamShield
 

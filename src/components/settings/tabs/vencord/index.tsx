@@ -20,7 +20,7 @@ import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { useSettings } from "@api/Settings";
 import { Divider } from "@components/Divider";
 import { FormSwitch } from "@components/FormSwitch";
-import { FolderIcon, GithubIcon, LogIcon, PaintbrushIcon, RestartIcon } from "@components/Icons";
+import { FolderIcon, GithubIcon, LogIcon, NotesIcon, PaintbrushIcon, RestartIcon } from "@components/Icons";
 import { QuickAction, QuickActionCard } from "@components/settings/QuickAction";
 import { SpecialCard } from "@components/settings/SpecialCard";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
@@ -31,7 +31,7 @@ import { IS_MAC, IS_WINDOWS } from "@utils/constants";
 import { Margins } from "@utils/margins";
 import { isPluginDev } from "@utils/misc";
 import { relaunch } from "@utils/native";
-import { Alerts, Forms, React, useMemo, UserStore } from "@webpack/common";
+import { Alerts, Forms, React, SettingsRouter, useMemo, UserStore } from "@webpack/common";
 
 import { isDonor } from "./DonateButton";
 import { VibrancySettings } from "./MacVibrancySettings";
@@ -175,6 +175,11 @@ function HeinoDiscordSettings() {
                 <Forms.FormTitle tag="h5">Quick Actions</Forms.FormTitle>
 
                 <QuickActionCard>
+                    <QuickAction
+                        Icon={NotesIcon}
+                        text="Support Desk"
+                        action={() => SettingsRouter.openUserSettings("heino_support_desk")}
+                    />
                     <QuickAction
                         Icon={LogIcon}
                         text="Notification Log"

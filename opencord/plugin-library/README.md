@@ -44,7 +44,7 @@ Install advanced plugins too:
 - `LinkCollector`: local link index export as JSON, CSV, or Markdown.
 - `AttachmentIndex`: local attachment metadata index export as JSON, CSV, or Markdown.
 - `PrivacyScan`: local sensitive-pattern scan with redacted samples and optional redacted report export.
-- `SupportQueueGuard`: local support ticket reminders for opened/read tickets that still need a reply, exposed through the visible Support Desk UI.
+- `SupportQueueGuard`: local support inbox with server allowlist, English-only filtering, smart classification, chat-bar access, and visible Support Desk UI.
 - `ScamShield`: local scam/RAT warning layer for fake support, dangerous files, suspicious links, and token-shaped strings.
 - `CustomerPrivacyGuard`: local outbound customer-data leak guard with an explicit `[allow-pii]` override.
 - `SecureSupportVault`: local AES-GCM encrypted support notes/drafts with auto-lock.

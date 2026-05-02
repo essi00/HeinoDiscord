@@ -153,9 +153,10 @@ For support tickets, use the visible Support Desk instead of a slash command:
 User Settings -> HeinoDiscord Settings -> Support Desk
 ```
 
-It automatically captures support DMs/ticket channels you open or receive
-messages in, then lets you open, mark done, snooze, or ignore conversations with
-buttons.
+It has its own chat-bar button and only tracks servers you add as support
+workspaces. Keep `English only` enabled if you do not handle Chinese or other
+non-English-script tickets. `Watch` trains the current channel as support;
+`Not support` trains the classifier to ignore it.
 
 These tools run inside the client, inspect only messages already loaded in the
 current channel or DM, and create local browser downloads when exporting. They
