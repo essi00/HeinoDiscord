@@ -24,12 +24,12 @@ const settings = definePluginSettings({
     },
     blockOutgoingHighRisk: {
         type: OptionType.BOOLEAN,
-        description: "Block outgoing high-risk messages unless you add [allow-risk].",
+        description: "Block outgoing high-risk links, token-shaped secrets, and strongly combined scam signals unless you add [allow-risk].",
         default: true
     },
     strictMode: {
         type: OptionType.BOOLEAN,
-        description: "Lower the warning threshold for suspicious support/security wording.",
+        description: "Lower the incoming warning threshold for suspicious support/security wording.",
         default: true
     },
     allowDiscordCdnFiles: {
@@ -40,6 +40,7 @@ const settings = definePluginSettings({
 });
 
 const URL_RE = /\bhttps?:\/\/[^\s<>()"]+/gi;
+const DISCORD_MARKUP_RE = /<(?:(?:@!?|@&|#)\d{17,20}|a?:[A-Za-z0-9_~-]{2,32}:\d{17,20}|t:\d{1,13}(?::[tTdDfFR])?)>/g;
 const DANGEROUS_EXT_RE = /\.(?:exe|scr|bat|cmd|ps1|psm1|vbs|vbe|js|jse|wsf|hta|msi|msp|apk|jar|com|pif|lnk|iso|img|dmg|pkg)(?:[?#]|$)/i;
 const ARCHIVE_EXT_RE = /\.(?:zip|rar|7z|tar|gz)(?:[?#]|$)/i;
 const IP_RE = /^(?:\d{1,3}\.){3}\d{1,3}$/;
@@ -52,9 +53,20 @@ const SAFE_HOSTS = new Set([
 ]);
 const CDN_HOSTS = new Set(["cdn.discordapp.com", "media.discordapp.net"]);
 const SUPPORT_SCAM_RE = /\b(?:accidentally reported|false report|discord staff|trust\s*&?\s*safety|support admin|verify your account|account will be banned|appeal your ban|scan this qr|change your email|change your password|screen share|remote access)\b/i;
-const MALWARE_SCRIPT_RE = /\b(?:powershell|cmd\.exe|terminal|run this script|paste this command|disable antivirus|windows defender|download and run|extract and run|anydesk|teamviewer|remcos|rat\b|stealer|token grabber)\b/i;
+const MALWARE_SCRIPT_RE = /\b(?:powershell|cmd\.exe|run this script|paste this command|paste this into|disable antivirus|windows defender|download and run|extract and run|anydesk|teamviewer|remcos|rat\b|stealer|token grabber)\b/i;
 const BAIT_RE = /\b(?:free nitro|nitro gift|steam gift|crypto airdrop|giveaway|wallet connect|seed phrase|private key|recovery phrase)\b/i;
 const TOKEN_RE = /\b[A-Za-z0-9_-]{24,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{20,}\b/g;
+const OUTGOING_BLOCK_TYPES = new Set([
+    "brand-lookalike-link",
+    "dangerous-discord-cdn-file",
+    "dangerous-file-link",
+    "token-shaped-secret"
+]);
+const OUTGOING_COMBINED_RISK_TYPES = new Set([
+    "archive-file-link",
+    "lookalike-domain",
+    "raw-ip-link"
+]);
 const warnedMessageIds = new Set<string>();
 
 function hostLooksAllowed(host: string) {
@@ -64,9 +76,16 @@ function hostLooksAllowed(host: string) {
     return false;
 }
 
+function languageScanContent(content: string) {
+    return content
+        .replace(URL_RE, " ")
+        .replace(DISCORD_MARKUP_RE, " ");
+}
+
 function analyzeText(content: string) {
     const findings: RiskFinding[] = [];
     const urls = content.match(URL_RE) ?? [];
+    const languageContent = languageScanContent(content);
 
     for (const rawUrl of urls) {
         let url: URL;
@@ -92,9 +111,9 @@ function analyzeText(content: string) {
         }
     }
 
-    if (SUPPORT_SCAM_RE.test(content)) findings.push({ type: "fake-support-language", detail: "support/account pressure wording", score: 4 });
-    if (MALWARE_SCRIPT_RE.test(content)) findings.push({ type: "malware-script-language", detail: "script/download/remote access wording", score: 6 });
-    if (BAIT_RE.test(content)) findings.push({ type: "scam-bait-language", detail: "nitro/gift/crypto/seed wording", score: 4 });
+    if (SUPPORT_SCAM_RE.test(languageContent)) findings.push({ type: "fake-support-language", detail: "support/account pressure wording", score: 4 });
+    if (MALWARE_SCRIPT_RE.test(languageContent)) findings.push({ type: "malware-script-language", detail: "script/download/remote access wording", score: 6 });
+    if (BAIT_RE.test(languageContent)) findings.push({ type: "scam-bait-language", detail: "nitro/gift/crypto/seed wording", score: 4 });
     TOKEN_RE.lastIndex = 0;
     if (TOKEN_RE.test(content)) findings.push({ type: "token-shaped-secret", detail: "token-like string", score: 8 });
 
@@ -107,6 +126,15 @@ function score(findings: RiskFinding[]) {
 
 function shouldWarn(findings: RiskFinding[]) {
     return score(findings) >= (settings.store.strictMode ? 4 : 7);
+}
+
+function shouldBlockOutgoing(findings: RiskFinding[]) {
+    if (!findings.length) return false;
+    if (findings.some(finding => OUTGOING_BLOCK_TYPES.has(finding.type))) return true;
+
+    const hasMalwareLanguage = findings.some(finding => finding.type === "malware-script-language");
+    const hasDeliveryRisk = findings.some(finding => OUTGOING_COMBINED_RISK_TYPES.has(finding.type));
+    return hasMalwareLanguage && hasDeliveryRisk && score(findings) >= 7;
 }
 
 function summary(findings: RiskFinding[]) {
@@ -193,7 +221,7 @@ export default definePlugin({
         }
 
         const findings = analyzeText(msg.content);
-        if (!settings.store.blockOutgoingHighRisk || !shouldWarn(findings)) return;
+        if (!settings.store.blockOutgoingHighRisk || !shouldBlockOutgoing(findings)) return;
 
         sendBotMessage(channelId, {
             content: [

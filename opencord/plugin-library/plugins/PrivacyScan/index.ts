@@ -31,9 +31,21 @@ const PATTERNS = [
     { type: "email", re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi },
     { type: "phone-like", re: /(?:\+?\d[\d\s().-]{7,}\d)/g },
     { type: "ipv4", re: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g },
-    { type: "discord-invite", re: /\b(?:https?:\/\/)?(?:discord\.gg|discord\.com\/invite)\/[a-z0-9-]+\b/gi },
     { type: "secret-like", re: /\b[A-Za-z0-9_-]{24,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{20,}\b/g }
 ];
+
+const RAW_PATTERNS = [
+    { type: "discord-invite", re: /\b(?:https?:\/\/)?(?:discord\.gg|discord\.com\/invite)\/[a-z0-9-]+\b/gi }
+];
+
+const DISCORD_MARKUP_RE = /<(?:(?:@!?|@&|#)\d{17,20}|a?:[A-Za-z0-9_~-]{2,32}:\d{17,20}|t:\d{1,13}(?::[tTdDfFR])?)>/g;
+const DISCORD_SNOWFLAKE_RE = /\b\d{17,20}\b/g;
+
+function sanitizeDiscordNoise(content: string) {
+    return content
+        .replace(DISCORD_MARKUP_RE, " ")
+        .replace(DISCORD_SNOWFLAKE_RE, " ");
+}
 
 function uniqueMessages(messages: Message[]) {
     const byId = new Map<string, Message>();
@@ -87,7 +99,23 @@ function scan(channelId: string, sampleLimit: number): ScanReport {
 
     for (const message of messages) {
         const content = message.content ?? "";
+        const scanContent = sanitizeDiscordNoise(content);
         for (const { type, re } of PATTERNS) {
+            re.lastIndex = 0;
+            for (const match of scanContent.matchAll(re)) {
+                counts.set(type, (counts.get(type) ?? 0) + 1);
+                if (findings.length >= sampleLimit) continue;
+
+                findings.push({
+                    type,
+                    messageId: message.id,
+                    author: message.author?.globalName || message.author?.username || message.author?.id || "Unknown",
+                    timestamp: message.timestamp ? new Date(message.timestamp).toISOString() : undefined,
+                    redacted: redact(match[0])
+                });
+            }
+        }
+        for (const { type, re } of RAW_PATTERNS) {
             re.lastIndex = 0;
             for (const match of content.matchAll(re)) {
                 counts.set(type, (counts.get(type) ?? 0) + 1);

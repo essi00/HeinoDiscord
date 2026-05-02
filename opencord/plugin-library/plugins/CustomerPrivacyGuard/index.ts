@@ -17,7 +17,7 @@ interface Finding {
 const settings = definePluginSettings({
     blockHighRiskSecrets: {
         type: OptionType.BOOLEAN,
-        description: "Block outgoing messages containing token-shaped strings, private keys, seed phrases, or payment card-like numbers.",
+        description: "Block outgoing messages containing token-shaped strings, private keys, seed phrases, or validated payment card numbers.",
         default: true
     },
     blockPersonalDataBursts: {
@@ -32,28 +32,82 @@ const settings = definePluginSettings({
     }
 });
 
+const DISCORD_MARKUP_RE = /<(?:(?:@!?|@&|#)\d{17,20}|a?:[A-Za-z0-9_~-]{2,32}:\d{17,20}|t:\d{1,13}(?::[tTdDfFR])?)>/g;
+const DISCORD_SNOWFLAKE_RE = /\b\d{17,20}\b/g;
+const URL_RE = /\bhttps?:\/\/[^\s<>()"]+/gi;
+const PAYMENT_CARD_CANDIDATE_RE = /\b(?:\d[ -]?){13,19}\b/g;
+
 const PATTERNS = [
     { type: "email", severity: "personal" as const, re: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi },
     { type: "phone-like", severity: "personal" as const, re: /(?:\+?\d[\d\s().-]{7,}\d)/g },
-    { type: "street-address-like", severity: "personal" as const, re: /\b\d{1,6}\s+[A-Za-z0-9.'-]+(?:\s+[A-Za-z0-9.'-]+){0,5}\s+(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|platz|strasse|straße|weg|gasse)\b/gi },
+    { type: "street-address-like", severity: "personal" as const, re: /\b\d{1,6}\s+[A-Za-z0-9.'-]+(?:\s+[A-Za-z0-9.'-]+){0,5}\s+(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|platz|strasse|weg|gasse)\b/gi },
     { type: "postal-code-like", severity: "personal" as const, re: /\b(?:\d{5}(?:-\d{4})?|[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2})\b/gi },
     { type: "discord-token-shaped", severity: "high" as const, re: /\b[A-Za-z0-9_-]{24,}\.[A-Za-z0-9_-]{6,}\.[A-Za-z0-9_-]{20,}\b/g },
     { type: "private-key-block", severity: "high" as const, re: /-----BEGIN [A-Z ]*PRIVATE KEY-----/g },
-    { type: "seed-phrase-language", severity: "high" as const, re: /\b(?:seed phrase|recovery phrase|private key|wallet words)\b/gi },
-    { type: "payment-card-like", severity: "high" as const, re: /\b(?:\d[ -]*?){13,19}\b/g }
+    { type: "seed-phrase-language", severity: "high" as const, re: /\b(?:seed phrase|recovery phrase|private key|wallet words)\b/gi }
 ];
+
+function sanitizeDiscordNoise(content: string) {
+    return content
+        .replace(URL_RE, " ")
+        .replace(DISCORD_MARKUP_RE, " ")
+        .replace(DISCORD_SNOWFLAKE_RE, " ");
+}
+
+function isValidPaymentCard(candidate: string) {
+    const digits = candidate.replace(/\D/g, "");
+    if (digits.length < 13 || digits.length > 19) return false;
+    if (/^(\d)\1+$/.test(digits)) return false;
+
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let index = digits.length - 1; index >= 0; index--) {
+        let value = Number(digits[index]);
+
+        if (shouldDouble) {
+            value *= 2;
+            if (value > 9) value -= 9;
+        }
+
+        sum += value;
+        shouldDouble = !shouldDouble;
+    }
+
+    return sum % 10 === 0;
+}
+
+function findPaymentCards(content: string) {
+    const cards = new Set<string>();
+    for (const match of content.matchAll(PAYMENT_CARD_CANDIDATE_RE)) {
+        const normalized = match[0].replace(/\D/g, "");
+        if (isValidPaymentCard(normalized)) cards.add(normalized);
+    }
+
+    return [...cards];
+}
 
 function analyze(content: string) {
     const findings: Finding[] = [];
+    const scanContent = sanitizeDiscordNoise(content);
 
     for (const pattern of PATTERNS) {
         pattern.re.lastIndex = 0;
-        const matches = content.match(pattern.re);
+        const matches = scanContent.match(pattern.re);
         if (!matches?.length) continue;
         findings.push({
             type: pattern.type,
             severity: pattern.severity,
             count: matches.length
+        });
+    }
+
+    const paymentCards = findPaymentCards(scanContent);
+    if (paymentCards.length) {
+        findings.push({
+            type: "payment-card",
+            severity: "high",
+            count: paymentCards.length
         });
     }
 
@@ -98,7 +152,7 @@ function maybeBlock(channelId: string, content: string) {
 
 export default definePlugin({
     name: "CustomerPrivacyGuard",
-    description: "Blocks accidental leaks of customer addresses, contact details, payment-like data, private keys, or token-shaped secrets.",
+    description: "Blocks accidental leaks of customer addresses, contact details, validated payment cards, private keys, or token-shaped secrets.",
     authors: [{ name: "Open Plugin Library", id: 0n }],
     tags: ["Privacy", "Utility", "Chat"],
     enabledByDefault: true,
