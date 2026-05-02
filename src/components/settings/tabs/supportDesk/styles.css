@@ -1,0 +1,265 @@
+.vc-support-desk-hero {
+    align-items: flex-start;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.vc-support-desk-title {
+    color: var(--header-primary);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 30px;
+    margin: 0 0 6px;
+}
+
+.vc-support-desk-intro {
+    margin: 0;
+    max-width: 760px;
+}
+
+.vc-support-desk-top-actions,
+.vc-support-desk-actions,
+.vc-support-desk-cleanup {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vc-support-desk-top-actions {
+    justify-content: flex-end;
+}
+
+.vc-support-desk-button-content {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+    min-width: 0;
+}
+
+.vc-support-desk-button-icon {
+    flex: 0 0 auto;
+    height: 16px;
+    width: 16px;
+}
+
+.vc-support-desk-stats {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
+    margin-bottom: 16px;
+}
+
+.vc-support-desk-stat {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.vc-support-desk-stat-danger {
+    border-color: var(--status-danger);
+}
+
+.vc-support-desk-stat-warning {
+    border-color: var(--status-warning);
+}
+
+.vc-support-desk-stat-success {
+    border-color: var(--status-positive);
+}
+
+.vc-support-desk-stat-value {
+    color: var(--header-primary);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 28px;
+}
+
+.vc-support-desk-stat-label,
+.vc-support-desk-eyebrow {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.vc-support-desk-current,
+.vc-support-desk-ticket,
+.vc-support-desk-empty {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+}
+
+.vc-support-desk-current {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 14px;
+}
+
+.vc-support-desk-current-title {
+    color: var(--header-primary);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+
+.vc-support-desk-current-note {
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 18px;
+    margin-top: 2px;
+}
+
+.vc-support-desk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vc-support-desk-section-header {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.vc-support-desk-section-title {
+    color: var(--header-primary);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    margin: 0;
+}
+
+.vc-support-desk-ticket {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 14px;
+}
+
+.vc-support-desk-ticket-overdue {
+    border-color: var(--status-danger);
+}
+
+.vc-support-desk-ticket-due-soon {
+    border-color: var(--status-warning);
+}
+
+.vc-support-desk-ticket-main {
+    min-width: 0;
+}
+
+.vc-support-desk-ticket-header {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.vc-support-desk-ticket-title {
+    background: transparent;
+    border: 0;
+    color: var(--header-primary);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 22px;
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    padding: 0;
+    text-align: left;
+}
+
+.vc-support-desk-ticket-title:hover {
+    color: var(--interactive-active);
+    text-decoration: underline;
+}
+
+.vc-support-desk-due {
+    color: var(--text-muted);
+    flex: 0 0 auto;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.vc-support-desk-ticket-overdue .vc-support-desk-due {
+    color: var(--status-danger);
+}
+
+.vc-support-desk-ticket-due-soon .vc-support-desk-due {
+    color: var(--status-warning);
+}
+
+.vc-support-desk-ticket-meta {
+    color: var(--text-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+    gap: 8px;
+    line-height: 18px;
+    margin-top: 4px;
+}
+
+.vc-support-desk-ticket-meta span:not(:last-child)::after {
+    color: var(--text-muted);
+    content: "•";
+    margin-left: 8px;
+}
+
+.vc-support-desk-snippet {
+    background: var(--background-modifier-accent);
+    border-left: 3px solid var(--interactive-muted);
+    border-radius: 6px;
+    color: var(--text-normal);
+    font-size: 13px;
+    line-height: 18px;
+    margin: 10px 0 0;
+    overflow-wrap: anywhere;
+    padding: 8px 10px;
+}
+
+.vc-support-desk-empty {
+    padding: 18px;
+}
+
+.vc-support-desk-empty-title {
+    color: var(--header-primary);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    margin-bottom: 4px;
+}
+
+@media (width <= 760px) {
+    .vc-support-desk-hero,
+    .vc-support-desk-current,
+    .vc-support-desk-section-header,
+    .vc-support-desk-ticket {
+        align-items: stretch;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .vc-support-desk-top-actions,
+    .vc-support-desk-actions,
+    .vc-support-desk-cleanup {
+        justify-content: flex-start;
+    }
+
+    .vc-support-desk-due {
+        align-self: flex-start;
+    }
+}

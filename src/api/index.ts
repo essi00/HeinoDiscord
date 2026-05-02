@@ -33,6 +33,7 @@ export * as PluginManager from "./PluginManager";
 import * as $ServerList from "./ServerList";
 import * as $Settings from "./Settings";
 import * as $Styles from "./Styles";
+import * as $SupportDesk from "./SupportDesk";
 import * as $Themes from "./Themes";
 import * as $UserSettings from "./UserSettings";
 
@@ -100,6 +101,10 @@ export const Settings = $Settings;
  * a
  */
 export const Styles = $Styles;
+/**
+ * Local support ticket queue helpers powering HeinoDiscord Support Desk.
+ */
+export const SupportDesk = $SupportDesk;
 /**
  * An API allowing you to display notifications
  */

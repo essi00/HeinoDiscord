@@ -127,7 +127,7 @@ The recommended library now includes local-only data helpers:
 - `/collect-links`
 - `/attachment-index`
 - `/privacy-scan`
-- `/ticket-guard`
+- `Support Desk` UI for ticket reminders and support triage
 - `/security-scan`
 - `/privacy-check`
 - `/secure-vault`
@@ -136,16 +136,19 @@ They use the loaded in-memory message cache and local browser downloads. They do
 not read account tokens, call Discord's history API, or send exports to a cloud
 service.
 
-For support work, `SupportQueueGuard` reminds you about opened/read tickets that
-still need a reply, `ScamShield` warns about fake-support/RAT patterns, and
-`CustomerPrivacyGuard` blocks accidental customer-data leaks. `SecureSupportVault`
-encrypts local support notes/drafts with WebCrypto AES-GCM; it is local note
-encryption, not Discord E2EE.
+For support work, `SupportQueueGuard` now feeds the visible `Support Desk`
+panel. It automatically adds opened/read tickets that still need a reply,
+tracks overdue conversations, and gives you buttons for open, done, snooze, and
+ignore. `ScamShield` warns about fake-support/RAT patterns, and
+`CustomerPrivacyGuard` blocks accidental customer-data leaks.
+`SecureSupportVault` encrypts local support notes/drafts with WebCrypto AES-GCM;
+it is local note encryption, not Discord E2EE.
 
 Inside Discord, HeinoDiscord library plugins are shown under:
 
 ```text
 User Settings -> HeinoDiscord Settings -> Heino Plugins
+User Settings -> HeinoDiscord Settings -> Support Desk
 ```
 
 The regular `Plugins` tab is kept for the wider compatibility plugin ecosystem.

@@ -98,14 +98,20 @@ Local privacy review for loaded messages.
 
 ### SupportQueueGuard
 
-Local SLA helper for customer-service tickets.
+Local SLA helper for customer-service tickets. The main workflow is the visible
+Support Desk panel:
+
+```text
+User Settings -> HeinoDiscord Settings -> Support Desk
+```
 
 - Watches ticket-like DMs and channels you open or receive messages in.
 - Marks a ticket done when you send a reply.
-- Use `/ticket-guard action:status` to list open local tickets.
-- Use `/ticket-guard action:snooze hours:2` to pause reminders.
-- Use `/ticket-guard action:done` after handling a ticket outside Discord.
-- Stores reminder metadata locally; no token and no cloud sync.
+- Shows overdue, due-soon, snoozed, and done counts.
+- Provides buttons for Open, Done, Snooze, Watch, Ignore, and cleanup.
+- Keeps `/ticket-guard` only as a fallback for power users.
+- Stores reminder metadata and redacted last-message snippets locally; no token
+  and no cloud sync.
 
 ### ScamShield
 

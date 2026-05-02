@@ -59,17 +59,17 @@ export const HEINO_LIBRARY_PLUGINS = [
     {
         name: "SupportQueueGuard",
         category: "Support SLA",
-        commands: ["/ticket-guard action:status", "/ticket-guard action:snooze hours:2"]
+        commands: ["Support Desk UI", "automatic overdue reminders", "auto done on reply"]
     },
     {
         name: "ScamShield",
         category: "Security",
-        commands: ["/security-scan", "[allow-risk] override"]
+        commands: ["automatic incoming warnings", "outgoing risk blocker", "[allow-risk] override"]
     },
     {
         name: "CustomerPrivacyGuard",
         category: "Privacy",
-        commands: ["/privacy-check text:<text>", "[allow-pii] override"]
+        commands: ["automatic PII send blocker", "local text checker", "[allow-pii] override"]
     },
     {
         name: "SecureSupportVault",

@@ -5,36 +5,10 @@
  */
 
 import { ApplicationCommandInputType, ApplicationCommandOptionType, findOption, sendBotMessage } from "@api/Commands";
-import * as DataStore from "@api/DataStore";
 import { definePluginSettings } from "@api/Settings";
+import { clearDoneTickets, createSupportTrackerOptions, formatDue, getActionableTickets, ignoreTicket, loadSupportState, markDone, markNeedsReply, saveSupportState, snoozeTicket, ticketScope } from "@api/SupportDesk";
 import definePlugin, { OptionType } from "@utils/types";
-import { ChannelStore, GuildStore, SelectedChannelStore, showToast, Toasts, UserStore } from "@webpack/common";
-
-type TicketStatus = "needsReply" | "done" | "snoozed" | "ignored";
-
-interface TicketRecord {
-    channelId: string;
-    channelName: string;
-    guildName?: string;
-    status: TicketStatus;
-    reason: string;
-    openedAt?: number;
-    lastIncomingAt?: number;
-    lastViewedAt?: number;
-    lastReplyAt?: number;
-    dueAt?: number;
-    snoozedUntil?: number;
-    lastReminderAt?: number;
-}
-
-interface QueueState {
-    version: 1;
-    tickets: Record<string, TicketRecord>;
-}
-
-const STORE_KEY = "HeinoSupportQueueGuard:v1";
-const stateFallback: QueueState = { version: 1, tickets: {} };
-let reminderTimer: ReturnType<typeof setInterval> | undefined;
+import { SelectedChannelStore, showToast, Toasts, UserStore } from "@webpack/common";
 
 const settings = definePluginSettings({
     enabledForDms: {
@@ -57,6 +31,11 @@ const settings = definePluginSettings({
         description: "When you open a ticket-like channel, mark it as needing a reply until you send one.",
         default: true
     },
+    autoMarkReplySent: {
+        type: OptionType.BOOLEAN,
+        description: "Automatically mark a tracked ticket done when you send a reply.",
+        default: true
+    },
     replySlaHours: {
         type: OptionType.NUMBER,
         description: "Default reply deadline in hours after opening or receiving a ticket message.",
@@ -67,6 +46,11 @@ const settings = definePluginSettings({
         description: "Minimum minutes between local overdue reminders for the same ticket.",
         default: 30
     },
+    toastNewTickets: {
+        type: OptionType.BOOLEAN,
+        description: "Show a local toast when a new support conversation starts needing a reply.",
+        default: true
+    },
     postLocalReminderInChannel: {
         type: OptionType.BOOLEAN,
         description: "Also post a local-only bot reminder in the overdue ticket channel when it is selected.",
@@ -74,184 +58,78 @@ const settings = definePluginSettings({
     }
 });
 
-function now() {
-    return Date.now();
+let reminderTimer: ReturnType<typeof setInterval> | undefined;
+
+function options() {
+    return createSupportTrackerOptions(settings.store);
 }
 
-function dueInMs(hours = settings.store.replySlaHours) {
-    return Math.max(1, Number(hours) || settings.store.replySlaHours) * 60 * 60 * 1000;
+function compactSnippet(content: string) {
+    return content
+        .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[email]")
+        .replace(/\b(?:\+?\d[\d\s().-]{7,}\d)\b/g, "[phone]")
+        .replace(/\b\d{12,19}\b/g, "[number]")
+        .replace(/\b\d{1,5}\s+[A-Za-z0-9.' -]{2,40}\s+(?:street|st|road|rd|avenue|ave|lane|ln|drive|dr|platz|strasse|straße|weg)\b/gi, "[address]")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 180);
 }
 
-async function getState(): Promise<QueueState> {
-    return await DataStore.get<QueueState>(STORE_KEY) ?? stateFallback;
-}
-
-async function saveState(state: QueueState) {
-    await DataStore.set(STORE_KEY, state);
-}
-
-function getChannelLabel(channelId: string) {
-    const channel = ChannelStore.getChannel(channelId);
-    const guild = channel?.guild_id ? GuildStore.getGuild(channel.guild_id) : undefined;
-
-    return {
-        channelName: channel?.name ? `#${channel.name}` : channelId,
-        guildName: guild?.name
-    };
-}
-
-function channelMatches(channelId: string) {
-    const channel = ChannelStore.getChannel(channelId);
-    if (!channel) return false;
-
-    if (!channel.guild_id) return settings.store.enabledForDms;
-    if (!settings.store.enabledForMatchingChannels) return false;
-
-    try {
-        return new RegExp(settings.store.ticketNamePattern, "i").test(channel.name ?? "");
-    } catch {
-        return false;
-    }
-}
-
-function formatTicket(ticket: TicketRecord) {
-    const due = ticket.dueAt ? new Date(ticket.dueAt).toLocaleString() : "no deadline";
-    const scope = ticket.guildName ? `${ticket.guildName} / ${ticket.channelName}` : ticket.channelName;
-    return `- **${scope}**: ${ticket.status}, due ${due}, reason: ${ticket.reason}`;
-}
-
-async function markNeedsReply(channelId: string, reason: string, hours?: number) {
-    if (!channelMatches(channelId)) return;
-
-    const state = await getState();
-    const label = getChannelLabel(channelId);
-    const existing = state.tickets[channelId];
-    const dueAt = now() + dueInMs(hours);
-
-    state.tickets[channelId] = {
-        ...existing,
-        channelId,
-        ...label,
-        status: "needsReply",
-        reason,
-        openedAt: existing?.openedAt ?? now(),
-        lastViewedAt: reason === "opened" ? now() : existing?.lastViewedAt,
-        lastIncomingAt: reason === "incoming message" ? now() : existing?.lastIncomingAt,
-        dueAt,
-        snoozedUntil: undefined
-    };
-
-    await saveState(state);
-}
-
-async function markDone(channelId: string, reason = "reply sent") {
-    const state = await getState();
-    const label = getChannelLabel(channelId);
-
-    state.tickets[channelId] = {
-        ...state.tickets[channelId],
-        channelId,
-        ...label,
-        status: "done",
-        reason,
-        lastReplyAt: now(),
-        dueAt: undefined,
-        snoozedUntil: undefined
-    };
-
-    await saveState(state);
-}
-
-async function snooze(channelId: string, hours: number) {
-    const state = await getState();
-    const label = getChannelLabel(channelId);
-
-    state.tickets[channelId] = {
-        ...state.tickets[channelId],
-        channelId,
-        ...label,
-        status: "snoozed",
-        reason: `snoozed for ${hours} hour(s)`,
-        snoozedUntil: now() + dueInMs(hours),
-        dueAt: now() + dueInMs(hours)
-    };
-
-    await saveState(state);
-}
-
-async function ignore(channelId: string) {
-    const state = await getState();
-    const label = getChannelLabel(channelId);
-
-    state.tickets[channelId] = {
-        ...state.tickets[channelId],
-        channelId,
-        ...label,
-        status: "ignored",
-        reason: "ignored manually",
-        dueAt: undefined,
-        snoozedUntil: undefined
-    };
-
-    await saveState(state);
-}
-
-async function getOpenTickets() {
-    const state = await getState();
-    const currentTime = now();
-
-    return Object.values(state.tickets)
-        .filter(ticket => ticket.status === "needsReply" || (ticket.status === "snoozed" && (ticket.snoozedUntil ?? 0) <= currentTime))
-        .sort((a, b) => (a.dueAt ?? Number.MAX_SAFE_INTEGER) - (b.dueAt ?? Number.MAX_SAFE_INTEGER));
-}
-
-async function showDashboard(channelId: string) {
-    const open = await getOpenTickets();
-
-    sendBotMessage(channelId, {
-        content: [
-            "**SupportQueueGuard**",
-            "Tracks ticket-like channels you opened or received messages in, then reminds you until you answer, snooze, or mark done.",
-            "",
-            open.length ? open.slice(0, 10).map(formatTicket).join("\n") : "No open support tickets tracked locally."
-        ].join("\n").slice(0, 1900)
-    });
+function authorName(message: any) {
+    return message?.author?.globalName || message?.author?.username || message?.author?.id;
 }
 
 async function checkOverdue() {
-    const open = await getOpenTickets();
-    const currentTime = now();
+    const state = await loadSupportState();
+    const open = getActionableTickets(state);
+    const currentTime = Date.now();
     const reminderMs = Math.max(1, settings.store.reminderMinutes) * 60 * 1000;
     const selectedChannelId = SelectedChannelStore.getChannelId?.();
     let changed = false;
 
-    const state = await getState();
     for (const ticket of open) {
         if (!ticket.dueAt || ticket.dueAt > currentTime) continue;
         if (ticket.lastReminderAt && currentTime - ticket.lastReminderAt < reminderMs) continue;
 
-        ticket.lastReminderAt = currentTime;
-        state.tickets[ticket.channelId] = ticket;
+        state.tickets[ticket.channelId] = {
+            ...ticket,
+            lastReminderAt: currentTime
+        };
         changed = true;
 
-        const label = ticket.guildName ? `${ticket.guildName} / ${ticket.channelName}` : ticket.channelName;
-        showToast(`Support ticket overdue: ${label}`, Toasts.Type.MESSAGE, {
+        showToast(`Support overdue: ${ticketScope(ticket)}`, Toasts.Type.MESSAGE, {
             position: Toasts.Position.BOTTOM
         });
 
         if (settings.store.postLocalReminderInChannel && selectedChannelId === ticket.channelId) {
             sendBotMessage(ticket.channelId, {
-                content: "SupportQueueGuard: this ticket is overdue. Use `/ticket-guard action:done`, `/ticket-guard action:snooze hours:2`, or reply to mark it done."
+                content: "Support Desk: this conversation is overdue. Open User Settings > HeinoDiscord Settings > Support Desk to act on it."
             });
         }
     }
 
-    if (changed) await saveState(state);
+    if (changed) await saveSupportState(state);
+}
+
+async function showFallbackDashboard(channelId: string) {
+    const state = await loadSupportState();
+    const open = getActionableTickets(state);
+
+    sendBotMessage(channelId, {
+        content: [
+            "**Support Desk**",
+            "The main workflow is now the visible UI at User Settings > HeinoDiscord Settings > Support Desk.",
+            "",
+            open.length
+                ? open.slice(0, 10).map(ticket => `- **${ticketScope(ticket)}**: ${formatDue(ticket)}, ${ticket.reason}`).join("\n")
+                : "No open support tickets tracked locally."
+        ].join("\n").slice(0, 1900)
+    });
 }
 
 export default definePlugin({
     name: "SupportQueueGuard",
-    description: "Local ticket SLA reminder for support channels and DMs you open but have not replied to.",
+    description: "Automatic local support inbox: tracks ticket-like DMs/channels, reminds you when replies are due, and feeds the Support Desk UI.",
     authors: [{ name: "Open Plugin Library", id: 0n }],
     tags: ["Utility", "Notifications", "Organisation"],
     enabledByDefault: true,
@@ -271,7 +149,7 @@ export default definePlugin({
     flux: {
         CHANNEL_SELECT({ channelId }: { channelId?: string; }) {
             if (!channelId || !settings.store.markOpenedAsNeedsReply) return;
-            void markNeedsReply(channelId, "opened");
+            void markNeedsReply(channelId, "opened", options());
         },
         MESSAGE_CREATE({ message }: any) {
             const channelId = message?.channel_id;
@@ -279,21 +157,31 @@ export default definePlugin({
 
             const currentUserId = UserStore.getCurrentUser?.()?.id;
             if (message?.author?.id && message.author.id === currentUserId) {
-                void markDone(channelId);
+                if (settings.store.autoMarkReplySent) void markDone(channelId, options());
                 return;
             }
 
-            void markNeedsReply(channelId, "incoming message");
+            const content = compactSnippet(message?.content ?? "");
+            void markNeedsReply(channelId, "incoming message", options(), {
+                authorName: authorName(message),
+                snippet: content,
+                messageId: message?.id
+            }).then(marked => {
+                if (!marked || !settings.store.toastNewTickets) return;
+                showToast("Support Desk added a conversation that needs a reply.", Toasts.Type.MESSAGE, {
+                    position: Toasts.Position.BOTTOM
+                });
+            });
         }
     },
 
     onBeforeMessageSend(channelId) {
-        void markDone(channelId);
+        if (settings.store.autoMarkReplySent) void markDone(channelId, options());
     },
 
     commands: [{
         name: "ticket-guard",
-        description: "Manage local support ticket reminders",
+        description: "Fallback controls for Support Desk",
         inputType: ApplicationCommandInputType.BUILT_IN,
         options: [
             {
@@ -314,45 +202,41 @@ export default definePlugin({
             const hours = Number(findOption(opts, "hours", settings.store.replySlaHours)) || settings.store.replySlaHours;
 
             if (action === "status" || action === "list") {
-                await showDashboard(ctx.channel.id);
+                await showFallbackDashboard(ctx.channel.id);
                 return;
             }
 
             if (action === "watch") {
-                await markNeedsReply(ctx.channel.id, "manual watch", hours);
-                sendBotMessage(ctx.channel.id, { content: `SupportQueueGuard: watching this ticket. Deadline in ${hours} hour(s).` });
+                await markNeedsReply(ctx.channel.id, "manual watch", options(), {}, hours, true);
+                sendBotMessage(ctx.channel.id, { content: `Support Desk: watching this conversation. Deadline in ${hours} hour(s).` });
                 return;
             }
 
             if (action === "done") {
-                await markDone(ctx.channel.id, "done manually");
-                sendBotMessage(ctx.channel.id, { content: "SupportQueueGuard: marked this ticket done." });
+                await markDone(ctx.channel.id, options(), "done manually");
+                sendBotMessage(ctx.channel.id, { content: "Support Desk: marked this conversation done." });
                 return;
             }
 
             if (action === "snooze") {
-                await snooze(ctx.channel.id, hours);
-                sendBotMessage(ctx.channel.id, { content: `SupportQueueGuard: snoozed this ticket for ${hours} hour(s).` });
+                await snoozeTicket(ctx.channel.id, hours, options());
+                sendBotMessage(ctx.channel.id, { content: `Support Desk: snoozed this conversation for ${hours} hour(s).` });
                 return;
             }
 
             if (action === "ignore") {
-                await ignore(ctx.channel.id);
-                sendBotMessage(ctx.channel.id, { content: "SupportQueueGuard: ignoring this ticket locally." });
+                await ignoreTicket(ctx.channel.id, options());
+                sendBotMessage(ctx.channel.id, { content: "Support Desk: ignoring this conversation locally." });
                 return;
             }
 
             if (action === "clear-done") {
-                const state = await getState();
-                for (const [channelId, ticket] of Object.entries(state.tickets)) {
-                    if (ticket.status === "done") delete state.tickets[channelId];
-                }
-                await saveState(state);
-                sendBotMessage(ctx.channel.id, { content: "SupportQueueGuard: cleared done ticket records." });
+                await clearDoneTickets();
+                sendBotMessage(ctx.channel.id, { content: "Support Desk: cleared done conversation records." });
                 return;
             }
 
-            sendBotMessage(ctx.channel.id, { content: "Unknown action. Use status, watch, done, snooze, ignore, or clear-done." });
+            sendBotMessage(ctx.channel.id, { content: "Unknown action. Use the Support Desk UI, or status, watch, done, snooze, ignore, clear-done." });
         }
     }]
 });

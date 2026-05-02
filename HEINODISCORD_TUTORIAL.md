@@ -66,6 +66,7 @@ These HeinoDiscord library plugins are managed in Discord under:
 
 ```text
 User Settings -> HeinoDiscord Settings -> Heino Plugins
+User Settings -> HeinoDiscord Settings -> Support Desk
 ```
 
 The regular `Plugins` tab is now reserved for the broader compatibility plugin
@@ -141,11 +142,20 @@ The recommended profile also includes token-free tools for loaded Discord data:
 /attachment-index format:json
 /privacy-scan
 /privacy-scan export:true format:markdown
-/ticket-guard action:status
 /security-scan
 /privacy-check text:customer@example.com
 /secure-vault action:unlock text:<passphrase>
 ```
+
+For support tickets, use the visible Support Desk instead of a slash command:
+
+```text
+User Settings -> HeinoDiscord Settings -> Support Desk
+```
+
+It automatically captures support DMs/ticket channels you open or receive
+messages in, then lets you open, mark done, snooze, or ignore conversations with
+buttons.
 
 These tools run inside the client, inspect only messages already loaded in the
 current channel or DM, and create local browser downloads when exporting. They

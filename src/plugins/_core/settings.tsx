@@ -17,8 +17,8 @@
 */
 
 import { definePluginSettings } from "@api/Settings";
-import { BackupRestoreIcon, CloudIcon, MainSettingsIcon, PaintbrushIcon, PatchHelperIcon, PlaceholderIcon, PluginsIcon, UpdaterIcon, VesktopSettingsIcon } from "@components/Icons";
-import { BackupAndRestoreTab, CloudTab, HeinoLibraryTab, PatchHelperTab, PluginsTab, ThemesTab, UpdaterTab, VencordTab } from "@components/settings/tabs";
+import { BackupRestoreIcon, CloudIcon, MainSettingsIcon, NotesIcon, PaintbrushIcon, PatchHelperIcon, PlaceholderIcon, PluginsIcon, UpdaterIcon, VesktopSettingsIcon } from "@components/Icons";
+import { BackupAndRestoreTab, CloudTab, HeinoLibraryTab, PatchHelperTab, PluginsTab, SupportDeskTab, ThemesTab, UpdaterTab, VencordTab } from "@components/settings/tabs";
 import { Devs } from "@utils/constants";
 import { isTruthy } from "@utils/guards";
 import definePlugin, { IconProps, OptionType } from "@utils/types";
@@ -177,6 +177,13 @@ export default definePlugin({
                 panelTitle: "HeinoDiscord Open Plugin Library",
                 Component: HeinoLibraryTab,
                 Icon: PluginsIcon
+            }),
+            buildEntry({
+                key: "heino_support_desk",
+                title: "Support Desk",
+                panelTitle: "HeinoDiscord Support Desk",
+                Component: SupportDeskTab,
+                Icon: NotesIcon
             }),
             buildEntry({
                 key: "vencord_plugins",

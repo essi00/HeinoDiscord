@@ -103,7 +103,7 @@ function HeinoPluginCard({ plugin, commands, category, onRestartNeeded }: {
             }
             footer={
                 <div className={cl("footer")}>
-                    <div className={cl("meta")}>Commands</div>
+                    <div className={cl("meta")}>Access</div>
                     <div className={cl("command-list")}>
                         {commands.map(command => (
                             <code key={command} className={cl("command")}>{command}</code>

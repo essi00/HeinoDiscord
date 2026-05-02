@@ -107,9 +107,9 @@
       "category": "support",
       "recommended": true,
       "advanced": false,
-      "description": "Local support ticket SLA reminders for opened tickets, incoming messages, snooze, done, and ignore workflows.",
+      "description": "Automatic local support inbox feeding the visible Support Desk UI with opened tickets, incoming messages, snooze, done, and ignore workflows.",
       "dependencies": ["CommandsAPI"],
-      "privacy": "Stores ticket reminder metadata locally in HeinoDiscordData; no message content or token is uploaded."
+      "privacy": "Stores ticket reminder metadata and redacted last-message snippets locally in HeinoDiscordData; no token is read and nothing is uploaded."
     },
     {
       "name": "ScamShield",

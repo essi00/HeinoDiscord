@@ -71,7 +71,7 @@
       "name": "SupportQueueGuard",
       "source": "opencord/plugin-library/plugins/SupportQueueGuard",
       "recommended": true,
-      "privacy": "local-only-ticket-metadata",
+      "privacy": "local-only-ticket-metadata-redacted-snippets",
       "network": []
     },
     {

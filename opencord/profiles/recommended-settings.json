@@ -120,7 +120,18 @@
       "LinkCollector": { "enabled": true },
       "AttachmentIndex": { "enabled": true },
       "PrivacyScan": { "enabled": true },
-      "SupportQueueGuard": { "enabled": true },
+      "SupportQueueGuard": {
+        "enabled": true,
+        "enabledForDms": true,
+        "enabledForMatchingChannels": true,
+        "ticketNamePattern": "ticket|support|order|customer|kunde|case",
+        "markOpenedAsNeedsReply": true,
+        "autoMarkReplySent": true,
+        "replySlaHours": 12,
+        "reminderMinutes": 30,
+        "toastNewTickets": true,
+        "postLocalReminderInChannel": true
+      },
       "ScamShield": { "enabled": true },
       "CustomerPrivacyGuard": { "enabled": true },
       "SecureSupportVault": { "enabled": true }
